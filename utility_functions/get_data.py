@@ -22,6 +22,8 @@ class GetData:
             seed (int): Seed for the random generator.
         """
         self.random_gen = random.Random(seed)  # Create an isolated random generator
+        self.fish_data = None  # To store the loaded fish DataFrame
+        self.selected_length = None  # To store the selected length column name
 
     def get_fish_data(self):
         """
@@ -44,14 +46,47 @@ class GetData:
 
         # Randomly select one of the Length columns
         length_columns = [col for col in df.columns if "Length" in col]
-        selected_length = self.random_gen.choice(length_columns)
+        self.selected_length = self.random_gen.choice(length_columns)
 
         # Create a filtered DataFrame with the selected Length column and other required columns
-        filtered_df = df_species[["Weight", selected_length, "Width", "Height"]].copy()
+        self.fish_data = df_species[["Weight", self.selected_length, "Width", "Height"]].copy()
 
-        return filtered_df.reset_index(drop=True)
+        return self.fish_data.reset_index(drop=True)
+
+    def get_prediction_data(self, num_points=5):
+        """
+        Generate prediction data by sampling numbers normally distributed over the range of
+        the selected length column in the bound fish dataset.
+
+        Args:
+            num_points (int): Number of prediction points to generate.
+
+        Returns:
+            pd.DataFrame: DataFrame with the generated prediction points.
+        """
+        if self.fish_data is None or self.selected_length is None:
+            raise ValueError("Fish data has not been loaded. Call 'get_fish_data' first.")
+
+        # Get the range of the selected length column
+        length_values = self.fish_data[self.selected_length]
+        mean_length = length_values.mean()
+        std_length = length_values.std()
+
+        # Generate normally distributed random numbers for the length column
+        generated_lengths = self.random_gen.gauss(mean_length, std_length)  # Single point
+        generated_lengths = [
+            self.random_gen.gauss(mean_length, std_length) for _ in range(num_points)
+        ]
+
+        # Create a DataFrame with the generated lengths
+        prediction_df = pd.DataFrame({
+            self.selected_length: generated_lengths
+        })
+        return prediction_df
+
 
 
 if __name__ == '__main__':
     getdata = GetData(43)
     print(getdata.get_fish_data())
+    print(getdata.get_prediction_data())
