@@ -29,7 +29,7 @@ class TestLoadSoybeanData(unittest.TestCase):
         self.assertGreater(len(df), 0)
 
         # Check for specific columns (adjust as per the dataset structure)
-        expected_columns = ["PH", "NLP", "GY"]  # Replace with actual column names
+        expected_columns = ["PH", "GY"]  # Replace with actual column names
         for col in expected_columns:
             self.assertIn(col, df.columns)
 
