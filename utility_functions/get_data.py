@@ -114,15 +114,15 @@ class GetData:
 
     def get_iris_prediction(self):
         """
-        Get the test split of the Iris dataset.
+        Get the test split of the Iris dataset, excluding the "target" column.
 
         Returns:
-            pd.DataFrame: Test data.
+            pd.DataFrame: Test data with the "target" column removed.
         """
         if self.iris_test is None:
             raise ValueError("Iris data has not been loaded. Call 'get_iris_data' first.")
 
-        return self.iris_test
+        return self.iris_test.drop(columns=["target"])
 
 
 if __name__ == '__main__':
