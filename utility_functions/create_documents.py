@@ -1,15 +1,27 @@
 # Copyright (c) 2025 Kyle Lopin (Naresuan University) <kylel@nu.ac.th>
 
 """
+Module for generating student-specific Word documents with prediction datasets for Fish and Iris.
+
+This module provides a function to create a Word document with formatted tables for Fish and Iris prediction
+datasets. The datasets are generated dynamically, and columns for missing values (e.g., Weight, Target)
+are left blank for students to fill.
+
+Features:
+- Generates prediction tables for Fish and Iris datasets.
+- Allows formatting numeric values to one decimal place.
+- Saves the output document with the student's name and a specified filename.
+
+Usage:
+    1. Prepare prediction datasets as pandas DataFrames.
+    2. Call `create_document` with the student's name and the datasets.
 
 """
 
 __author__ = "Kyle Vitautas Lopin"
 
-
 # installed libraries
 from docx import Document
-from docx.shared import Pt
 import pandas as pd
 
 
@@ -37,14 +49,17 @@ def create_document(student_name, fish_data, iris_data, output_file="midterm.doc
     # Add column headers
     hdr_cells = table.rows[0].cells
     for i, col in enumerate(fish_data.columns):
-        hdr_cells[i].text = col
+        hdr_cells[i].text = col + " (cm)"
     hdr_cells[len(fish_data.columns)].text = "Weight (To Predict)"  # Blank column
 
     # Add rows for fish data
     for _, row in fish_data.iterrows():
         row_cells = table.add_row().cells
         for i, val in enumerate(row):
-            row_cells[i].text = str(val)
+            if isinstance(val, (float, int)):  # Check if value is numeric
+                row_cells[i].text = f"{val:.1f}"  # Format to 1 decimal place
+            else:
+                row_cells[i].text = str(val)  # Keep non-numeric values as is
         row_cells[len(fish_data.columns)].text = ""  # Leave Weight blank
 
     # Add a new line
