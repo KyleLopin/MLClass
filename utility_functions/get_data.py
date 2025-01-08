@@ -11,6 +11,8 @@ import random
 
 # installed libraries
 import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
 
 
 class GetData:
@@ -84,9 +86,49 @@ class GetData:
         })
         return prediction_df
 
+    def get_iris_data(self, test_size=0.05):
+        """
+        Load the Iris dataset and split it into training and test sets.
+
+        Args:
+            test_size (float): Proportion of the dataset to include in the test split.
+
+        Returns:
+            pd.DataFrame: Training data.
+        """
+        # Load the Iris dataset
+        iris = load_iris()
+        data = pd.DataFrame(iris.data, columns=iris.feature_names)
+        data['target'] = iris.target
+
+        # Split the dataset into training and test sets
+        train, test = train_test_split(
+            data, test_size=test_size, random_state=self.random_gen.randint(0, 2 ** 32 - 1)
+        )
+
+        # Store the splits
+        self.iris_train = train.reset_index(drop=True)
+        self.iris_test = test.reset_index(drop=True)
+
+        return self.iris_train
+
+    def get_iris_prediction(self):
+        """
+        Get the test split of the Iris dataset.
+
+        Returns:
+            pd.DataFrame: Test data.
+        """
+        if self.iris_test is None:
+            raise ValueError("Iris data has not been loaded. Call 'get_iris_data' first.")
+
+        return self.iris_test
 
 
 if __name__ == '__main__':
     getdata = GetData(43)
     print(getdata.get_fish_data())
     print(getdata.get_prediction_data())
+    print(getdata.get_iris_data())
+    print('=====')
+    print(getdata.get_iris_prediction())
