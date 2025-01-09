@@ -1,0 +1,5 @@
+# Ignore the files in schematics folder
+electronics/schematics/*
+# excpet for python files
+!electronics/schematics/*.py
+

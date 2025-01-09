@@ -1,0 +1,1 @@
+Store scripts to make electronic circuits schematics here. Doesnt belong in the Machine Learning repo, but I don't want to make another.
