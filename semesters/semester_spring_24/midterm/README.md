@@ -1,5 +1,12 @@
 # Semester Spring 2024
 
+## Midterm Review
+
+[Midterm Review - Google Colab]([Midterm Template - Google Colab](https://colab.research.google.com/drive/19HZ_guk1r__HR6NDlcmX0rcplNdREaeS?usp=sharing/copy)
+
+
+---
+
 ## Midterm Template (NOT MIDTERM)
 Access the midterm template in Google Colab using the link below:
 
