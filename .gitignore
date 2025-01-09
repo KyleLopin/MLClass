@@ -2,4 +2,4 @@
 electronics/schematics/*
 # excpet for python files
 !electronics/schematics/*.py
-
+!electronics/schematics/*/*.py
