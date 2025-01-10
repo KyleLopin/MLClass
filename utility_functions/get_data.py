@@ -115,7 +115,7 @@ class GetData:
 
         # Generate uniformly distributed random numbers for the length column
         generated_lengths = [
-            self.random_gen.uniform(length_values.min(), length_values.max()) for _ in range(num_points)
+            round(self.random_gen.uniform(length_values.min(), length_values.max()), 1) for _ in range(num_points)
         ]
 
         # Create a DataFrame with the generated lengths
