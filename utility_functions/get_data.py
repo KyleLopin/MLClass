@@ -46,13 +46,15 @@ class GetData:
         """
         self.random_gen = random.Random(seed)  # Create an isolated random generator
 
-    def load_data(self, num_points=5, test_size=0.05):
+    def load_data(self, num_points=5, test_size=0.05, num_apartments=10, rent_test_size=0.2):
         """
-        Load and prepare all necessary datasets (Fish and Iris) in one call.
+        Load and prepare all necessary datasets (Fish, Iris, and Apartment Rents) in one call.
 
         Args:
             num_points (int): Number of prediction points to generate for Fish.
             test_size (float): Proportion of the Iris dataset to include in the test split.
+            num_apartments (int): Number of rows to generate for the Apartment Rents dataset.
+            rent_test_size (float): Proportion of the Apartment Rents dataset to include in the test split.
 
         Returns:
             dict: A dictionary containing the prepared datasets:
@@ -60,17 +62,22 @@ class GetData:
                 - 'fish_prediction': Prediction data for fish.
                 - 'iris_train': Training data for Iris.
                 - 'iris_prediction': Prediction (test) data for Iris.
+                - 'apartment_train': Training data for apartment rents.
+                - 'apartment_test': Test data for apartment rents.
         """
         # Call private methods to load individual datasets
         fish_data, fish_prediction = self._get_fish_data(num_points)
-        iris_train, iris_prediction = self._get_iris_data(test_size=test_size)
+        iris_train, iris_prediction = self._get_iris_data(test_size)
+        apartment_train, apartment_test = self._get_apartment_rents(num_apartments, rent_test_size)
 
         # Return all datasets in a dictionary
         return {
             "fish_data": fish_data,
             "fish_prediction": fish_prediction,
             "iris_train": iris_train,
-            "iris_prediction": iris_prediction
+            "iris_prediction": iris_prediction,
+            "apartment_train": apartment_train,
+            "apartment_prediction": apartment_test,
         }
 
     def _get_fish_data(self, num_points=5):
@@ -151,6 +158,45 @@ class GetData:
         # Return both training data and prediction data
         return iris_train, iris_prediction
 
+    def _get_apartment_rents(self, num_apartments=10, test_size=0.2):
+        """
+        Generate synthetic data for apartment rents with increments of 100 baht and split into training and test sets.
+
+        Args:
+            num_apartments (int): Total number of rows to generate.
+            test_size (float): Proportion of the dataset to include in the test split.
+
+        Returns:
+            tuple: A tuple containing:
+                - train_data (pd.DataFrame): Training dataset.
+                - test_data (pd.DataFrame): Test dataset.
+        """
+        # Generate random apartment sizes
+        square_meters = [self.random_gen.randint(30, 80) for _ in range(num_apartments)]
+
+        # Define a base rent multiplier (in increments of 100)
+        base_rate = self.random_gen.choice([2, 3])  # Base rate is either 200 or 300 baht
+        coefficient = self.random_gen.randrange(1, 3)  # Random coefficient for rent
+
+        # Calculate rents with noise
+        rents = [
+            (base_rate + coefficient * sm + self.random_gen.randint(-1, 5)) * 100
+            for sm in square_meters
+        ]
+
+        # Create the full dataset
+        apartment_rents = pd.DataFrame({
+            "square_meters": square_meters,
+            "rent (baht)": rents,
+        })
+
+        # Split into training and test sets
+        train_data, test_data = train_test_split(
+            apartment_rents, test_size=test_size, random_state=self.random_gen.randint(0, 2 ** 32 - 1)
+        )
+
+        return train_data.reset_index(drop=True), test_data.reset_index(drop=True)
+
 
 # Example Usage
 if __name__ == '__main__':
@@ -168,3 +214,11 @@ if __name__ == '__main__':
 
     print("\nIris Prediction Data:")
     print(datasets["iris_prediction"])
+
+    print("\nApartment Training Data:")
+    print(datasets["apartment_train"])
+
+    print("\nApartment Prediction Data:")
+    print(datasets["apartment_prediction"])
+
+    print(datasets.keys())
