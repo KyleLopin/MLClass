@@ -20,68 +20,86 @@ Usage:
 
 __author__ = "Kyle Vitautas Lopin"
 
+# standard libraries
+from io import BytesIO
+from pathlib import Path
+import pickle
+
 # installed libraries
 from docx import Document
 import pandas as pd
 
 
-def create_document(student_name, fish_data, iris_data, output_file="midterm.docx"):
+def insert_table_at_paragraph(doc, paragraph, df, extra_column_name="Prediction"):
+    """
+    Insert a table at the location of a paragraph and remove the paragraph.
+
+    Args:
+        doc (Document): The Word document object.
+        paragraph (Paragraph): The paragraph to be replaced with the table.
+        df (pd.DataFrame): The DataFrame to convert into a table.
+        extra_column_name (str): Name of the extra column to add to the table.
+    """
+    # Get the parent element of the paragraph
+    parent_element = paragraph._element
+
+    # Add a new table with an extra column for the Prediction
+    table = doc.add_table(rows=1, cols=len(df.columns) + 1)
+    table.style = "Table Grid"
+
+    # Add the header row, including the extra column
+    hdr_cells = table.rows[0].cells
+    for i, column in enumerate(df.columns):
+        hdr_cells[i].text = str(column)
+    hdr_cells[len(df.columns)].text = extra_column_name  # Add the extra column name
+
+    # Add the data rows
+    for _, row in df.iterrows():
+        row_cells = table.add_row().cells
+        for i, value in enumerate(row):
+            row_cells[i].text = str(value)
+        row_cells[len(df.columns)].text = ""  # Leave the extra column blank
+
+    # Insert the table into the document at the correct location
+    parent_element.addnext(table._element)
+
+    # Remove the placeholder paragraph
+    parent_element.getparent().remove(parent_element)
+
+
+def create_document(student_name: str, tables: dict, output_file="midterm.docx") -> None:
     """
     Create a Word document with tables for fish and iris prediction datasets for a student.
 
     Args:
         student_name (str): The name of the student.
-        fish_data (pd.DataFrame): Prediction dataset for fish (without Weight).
-        iris_data (pd.DataFrame): Prediction dataset for iris (without Target).
+        tables (dict): Dictionary of placeholders and DataFrames to replace them with.
+                       (e.g., {"{Table 1}": df1, "{Table 2}": df2}).
         output_file (str): Name of the output Word document.
     """
-    # Initialize the document
-    doc = Document()
 
-    # Add a title with the student's name
-    doc.add_heading(f"Prediction Data Sets for {student_name}", level=1)
+    template_file = Path(__file__).parent.parent / "templates" / "templates.pkl"
+    # get document from templates
+    with open(template_file, "rb") as file:
+        templates = pickle.load(file)
+    doc = templates["midterm jan 25"]
 
-    # Add Fish Dataset
-    doc.add_heading("Fish Prediction Data", level=2)
-    table = doc.add_table(rows=1, cols=len(fish_data.columns) + 1)  # Add one column for Weight
-    table.style = 'Light Grid Accent 1'
+    # Load the binary data into a Document object, make it harder for students to read
+    if isinstance(doc, bytes):
+        doc = Document(BytesIO(doc))
 
-    # Add column headers
-    hdr_cells = table.rows[0].cells
-    for i, col in enumerate(fish_data.columns):
-        hdr_cells[i].text = col + " (cm)"
-    hdr_cells[len(fish_data.columns)].text = "Weight (To Predict)"  # Blank column
+    # replace student name
+    for paragraph in doc.paragraphs:
+        if "{Name}" in paragraph.text:
+            paragraph.text = paragraph.text.replace("{Name}", student_name)
 
-    # Add rows for fish data
-    for _, row in fish_data.iterrows():
-        row_cells = table.add_row().cells
-        for i, val in enumerate(row):
-            if isinstance(val, (float, int)):  # Check if value is numeric
-                row_cells[i].text = f"{val:.1f}"  # Format to 1 decimal place
-            else:
-                row_cells[i].text = str(val)  # Keep non-numeric values as is
-        row_cells[len(fish_data.columns)].text = ""  # Leave Weight blank
-
-    # Add a new line
-    doc.add_paragraph("\n")
-
-    # Add Iris Dataset
-    doc.add_heading("Iris Prediction Data", level=2)
-    table = doc.add_table(rows=1, cols=len(iris_data.columns) + 1)  # Add one column for Target
-    table.style = 'Light Grid Accent 2'
-
-    # Add column headers
-    hdr_cells = table.rows[0].cells
-    for i, col in enumerate(iris_data.columns):
-        hdr_cells[i].text = col
-    hdr_cells[len(iris_data.columns)].text = "Target (To Predict)"  # Blank column
-
-    # Add rows for iris data
-    for _, row in iris_data.iterrows():
-        row_cells = table.add_row().cells
-        for i, val in enumerate(row):
-            row_cells[i].text = str(val)
-        row_cells[len(iris_data.columns)].text = ""  # Leave Target blank
+    # Replace table placeholders with actual tables
+    for table_placeholder, (df, target_column_name) in tables.items():
+        for paragraph in doc.paragraphs:
+            if table_placeholder in paragraph.text:
+                # Replace the placeholder paragraph with the table
+                insert_table_at_paragraph(doc, paragraph, df, target_column_name)
+                break  # Stop searching after replacing the placeholder
 
     # Save the document
     doc.save(f"{student_name}_{output_file}")
@@ -103,7 +121,9 @@ if __name__ == '__main__':
     })
 
     # Student name
-    student_name = "John Doe"
+    _student_name = "John Doe"
+    _tables = {"{Table 1}": [fish_prediction_data, "Predicted weight (grams)"],
+               "{Table 2}": [iris_prediction_data, "Predicted species"]}
 
     # Create the document
-    create_document(student_name, fish_prediction_data, iris_prediction_data, output_file="predictions.docx")
+    create_document(_student_name, _tables)
