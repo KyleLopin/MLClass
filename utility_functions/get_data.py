@@ -16,6 +16,27 @@ from sklearn.model_selection import train_test_split
 
 
 class GetData:
+    """
+    A utility class for loading and processing datasets for machine learning tasks.
+
+    This class provides methods to:
+    - Load a fish dataset, filter it by a randomly selected species and length column,
+      and generate prediction data based on the selected length.
+    - Load the Iris dataset, split it into training and test sets, and prepare prediction data.
+
+    Attributes:
+        random_gen (random.Random): A random number generator initialized with a seed to ensure reproducibility.
+
+    Methods:
+        load_data(num_points=5, test_size=0.05):
+            Load and prepare all datasets (Fish and Iris) in one call.
+
+        _get_fish_data(num_points=5):
+            Load the fish dataset, filter it by species and length column, and generate prediction data.
+
+        _get_iris_data(test_size=0.05):
+            Load the Iris dataset, split it into training and test sets, and prepare prediction data.
+    """
     def __init__(self, seed):
         """
         Initialize the GetData class with a random generator.
@@ -24,17 +45,46 @@ class GetData:
             seed (int): Seed for the random generator.
         """
         self.random_gen = random.Random(seed)  # Create an isolated random generator
-        self.fish_data = None  # To store the loaded fish DataFrame
-        self.selected_length = None  # To store the selected length column name
 
-    def get_fish_data(self):
+    def load_data(self, num_points=5, test_size=0.05):
         """
-        Randomly select one species and one Length column (keeping Width, Height, and Weight)
-        from the fish dataset and return a filtered DataFrame.
+        Load and prepare all necessary datasets (Fish and Iris) in one call.
+
+        Args:
+            num_points (int): Number of prediction points to generate for Fish.
+            test_size (float): Proportion of the Iris dataset to include in the test split.
 
         Returns:
-            pd.DataFrame: Filtered DataFrame with the selected species and columns.
+            dict: A dictionary containing the prepared datasets:
+                - 'fish_data': Filtered fish data with selected species and columns.
+                - 'fish_prediction': Prediction data for fish.
+                - 'iris_train': Training data for Iris.
+                - 'iris_prediction': Prediction (test) data for Iris.
+        """
+        # Call private methods to load individual datasets
+        fish_data, fish_prediction = self._get_fish_data(num_points)
+        iris_train, iris_prediction = self._get_iris_data(test_size=test_size)
 
+        # Return all datasets in a dictionary
+        return {
+            "fish_data": fish_data,
+            "fish_prediction": fish_prediction,
+            "iris_train": iris_train,
+            "iris_prediction": iris_prediction
+        }
+
+    def _get_fish_data(self, num_points=5):
+        """
+        Randomly select one species and one Length column (keeping Width, Height, and Weight)
+        from the fish dataset, return a filtered DataFrame, and generate prediction data.
+
+        Args:
+            num_points (int): Number of prediction points to generate.
+
+        Returns:
+            dict: A dictionary containing:
+                - "fish_data": Filtered DataFrame with the selected species and columns.
+                - "fish_prediction": DataFrame with generated prediction data.
         """
         # Load the fish dataset
         df = pd.read_csv("hf://datasets/scikit-learn/Fish/Fish.csv")
@@ -48,53 +98,38 @@ class GetData:
 
         # Randomly select one of the Length columns
         length_columns = [col for col in df.columns if "Length" in col]
-        self.selected_length = self.random_gen.choice(length_columns)
+        selected_length = self.random_gen.choice(length_columns)
 
         # Create a filtered DataFrame with the selected Length column and other required columns
-        self.fish_data = df_species[["Weight", self.selected_length, "Width", "Height"]].copy()
-
-        return self.fish_data.reset_index(drop=True)
-
-    def get_prediction_data(self, num_points=5):
-        """
-        Generate prediction data by sampling numbers normally distributed over the range of
-        the selected length column in the bound fish dataset.
-
-        Args:
-            num_points (int): Number of prediction points to generate.
-
-        Returns:
-            pd.DataFrame: DataFrame with the generated prediction points.
-        """
-        if self.fish_data is None or self.selected_length is None:
-            raise ValueError("Fish data has not been loaded. Call 'get_fish_data' first.")
+        fish_data = df_species[["Weight", selected_length, "Width", "Height"]].copy()
 
         # Get the range of the selected length column
-        length_values = self.fish_data[self.selected_length]
-        mean_length = length_values.mean()
-        std_length = length_values.std()
+        length_values = fish_data[selected_length]
 
-        # Generate normally distributed random numbers for the length column
-        generated_lengths = self.random_gen.gauss(mean_length, std_length)  # Single point
+        # Generate uniformly distributed random numbers for the length column
         generated_lengths = [
-            self.random_gen.gauss(mean_length, std_length) for _ in range(num_points)
+            self.random_gen.uniform(length_values.min(), length_values.max()) for _ in range(num_points)
         ]
 
         # Create a DataFrame with the generated lengths
         prediction_df = pd.DataFrame({
-            self.selected_length: generated_lengths
+            selected_length: generated_lengths
         })
-        return prediction_df
 
-    def get_iris_data(self, test_size=0.05):
+        # Return both fish data and prediction data
+        return fish_data.reset_index(drop=True), prediction_df
+
+    def _get_iris_data(self, test_size=0.05):
         """
-        Load the Iris dataset and split it into training and test sets.
+        Load the Iris dataset, split it into training and test sets, and prepare prediction data.
 
         Args:
             test_size (float): Proportion of the dataset to include in the test split.
 
         Returns:
-            pd.DataFrame: Training data.
+            tuple: A tuple containing:
+                - pd.DataFrame: Training data with the target column.
+                - pd.DataFrame: Prediction data (test set without the target column).
         """
         # Load the Iris dataset
         iris = load_iris()
@@ -107,28 +142,29 @@ class GetData:
         )
 
         # Store the splits
-        self.iris_train = train.reset_index(drop=True)
-        self.iris_test = test.reset_index(drop=True)
+        iris_train = train.reset_index(drop=True)
+        iris_test = test.reset_index(drop=True)
 
-        return self.iris_train
+        # Create the prediction set by removing the target column from the test set
+        iris_prediction = iris_test.drop(columns=["target"])
 
-    def get_iris_prediction(self):
-        """
-        Get the test split of the Iris dataset, excluding the "target" column.
-
-        Returns:
-            pd.DataFrame: Test data with the "target" column removed.
-        """
-        if self.iris_test is None:
-            raise ValueError("Iris data has not been loaded. Call 'get_iris_data' first.")
-
-        return self.iris_test.drop(columns=["target"])
+        # Return both training data and prediction data
+        return iris_train, iris_prediction
 
 
+# Example Usage
 if __name__ == '__main__':
     getdata = GetData(43)
-    print(getdata.get_fish_data())
-    print(getdata.get_prediction_data())
-    print(getdata.get_iris_data())
-    print('=====')
-    print(getdata.get_iris_prediction())
+    datasets = getdata.load_data()
+
+    print("Fish Data:")
+    print(datasets["fish_data"])
+
+    print("\nFish Prediction Data:")
+    print(datasets["fish_prediction"])
+
+    print("\nIris Training Data:")
+    print(datasets["iris_train"])
+
+    print("\nIris Prediction Data:")
+    print(datasets["iris_prediction"])
