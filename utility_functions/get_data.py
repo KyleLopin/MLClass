@@ -142,6 +142,7 @@ class GetData:
         iris = load_iris()
         data = pd.DataFrame(iris.data, columns=iris.feature_names)
         data['target'] = iris.target
+        data['target'] = data['target'].map({i: name for i, name in enumerate(iris.target_names)})
 
         # Split the dataset into training and test sets
         train, test = train_test_split(
