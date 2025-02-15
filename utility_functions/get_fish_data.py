@@ -44,7 +44,7 @@ def get_fish_data(random_gen: random.Random, dataset: str,
         # Train Linear Regression model
         model = LinearRegression()
         model.fit(df_species[["Length3"]], df_species["Weight"])
-        weight_coefficient = model.coef_[0]
+        weight_coefficient =round(model.coef_[0], 2)
 
         return selected_fish, weight_coefficient
 

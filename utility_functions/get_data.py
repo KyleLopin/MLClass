@@ -7,13 +7,16 @@
 __author__ = "Kyle Vitautas Lopin"
 
 # standard libraries
-importlib
+import importlib
 import random
 
 # installed libraries
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
+
+# local files
+import get_fish_data
 
 
 class GetData:
@@ -38,7 +41,7 @@ class GetData:
         _get_iris_data(test_size=0.05):
             Load the Iris dataset, split it into training and test sets, and prepare prediction datasets.
     """
-    def __init__(self, seed, dateset: str, **kwargs):
+    def __init__(self, seed):
         """
         Initialize the GetData class with a random generator.
 
@@ -47,12 +50,21 @@ class GetData:
         """
         self.random_gen = random.Random(seed)  # Create an isolated random generator
 
-    def load_data(self):
-        dataset_loader = self._get_dataset_loader()
-        if dataset_loader:
-            return dataset_loader(self.random_gen, **self.kwargs)
+    def load_data(self, dataset_loader: str, **kwargs):
+        """
+        Load and prepare the dataset based on the specified dataset type.
+
+        Args:
+            dataset_type (str): The dataset to load (e.g., "fish", "iris", "weather").
+            **kwargs: Additional arguments for dataset processing (e.g., date, test_size).
+
+        Returns:
+            tuple: Processed datasets .
+        """
+        if "fish" in dataset_loader:
+            return get_fish_data.get_fish_data(self.random_gen, dataset_loader)
         else:
-            raise ValueError(f"Dataset '{self.dataset_type}' is not supported.")
+            raise ValueError(f"Dataset '{dataset_loader}' is not supported.")
 
     def _get_dataset_loader(self):
         """
@@ -200,24 +212,27 @@ def check_loaded():
 # Example Usage
 if __name__ == '__main__':
     getdata = GetData(43)
-    datasets = getdata.load_data()
+    datasets = getdata.load_data("fish coeff")
 
-    print("Fish Data:")
-    print(datasets["fish_data"])
 
-    print("\nFish Prediction Data:")
-    print(datasets["fish_prediction"])
-
-    print("\nIris Training Data:")
-    print(datasets["iris_train"])
-
-    print("\nIris Prediction Data:")
-    print(datasets["iris_prediction"])
-
-    print("\nApartment Training Data:")
-    print(datasets["apartment_train"])
-
-    print("\nApartment Prediction Data:")
-    print(datasets["apartment_prediction"])
-
-    print(datasets.keys())
+    print(datasets)
+    #
+    # print("Fish Data:")
+    # print(datasets["fish_data"])
+    #
+    # print("\nFish Prediction Data:")
+    # print(datasets["fish_prediction"])
+    #
+    # print("\nIris Training Data:")
+    # print(datasets["iris_train"])
+    #
+    # print("\nIris Prediction Data:")
+    # print(datasets["iris_prediction"])
+    #
+    # print("\nApartment Training Data:")
+    # print(datasets["apartment_train"])
+    #
+    # print("\nApartment Prediction Data:")
+    # print(datasets["apartment_prediction"])
+    #
+    # print(datasets.keys())
