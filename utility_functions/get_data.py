@@ -204,18 +204,21 @@ class GetData:
 
 
 def check_loaded():
+    import ipywidgets as widgets
+    from IPython.display import display, clear_output
+    import random
+    from utility_functions.get_data import GetData
     print("\n\n\n\n================Loaded properly !!! ================ \n")
-
-
 
 
 # Example Usage
 if __name__ == '__main__':
     getdata = GetData(43)
-    datasets = getdata.load_data("fish coeff")
+    dataset = getdata.load_data("fish coeff")
+    print(dataset)
+    dataset = getdata.load_data("fish cost")
 
-
-    print(datasets)
+    print(dataset)
     #
     # print("Fish Data:")
     # print(datasets["fish_data"])
