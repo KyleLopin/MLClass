@@ -21,8 +21,8 @@ class GetData:
 
     This class provides methods to:
     - Load a fish dataset, filter it by a randomly selected species and length column,
-      and generate prediction data based on the selected length.
-    - Load the Iris dataset, split it into training and test sets, and prepare prediction data.
+      and generate prediction datasets based on the selected length.
+    - Load the Iris dataset, split it into training and test sets, and prepare prediction datasets.
 
     Attributes:
         random_gen (random.Random): A random number generator initialized with a seed to ensure reproducibility.
@@ -32,10 +32,10 @@ class GetData:
             Load and prepare all datasets (Fish and Iris) in one call.
 
         _get_fish_data(num_points=5):
-            Load the fish dataset, filter it by species and length column, and generate prediction data.
+            Load the fish dataset, filter it by species and length column, and generate prediction datasets.
 
         _get_iris_data(test_size=0.05):
-            Load the Iris dataset, split it into training and test sets, and prepare prediction data.
+            Load the Iris dataset, split it into training and test sets, and prepare prediction datasets.
     """
     def __init__(self, seed):
         """
@@ -58,12 +58,12 @@ class GetData:
 
         Returns:
             dict: A dictionary containing the prepared datasets:
-                - 'fish_data': Filtered fish data with selected species and columns.
-                - 'fish_prediction': Prediction data for fish.
-                - 'iris_train': Training data for Iris.
-                - 'iris_prediction': Prediction (test) data for Iris.
-                - 'apartment_train': Training data for apartment rents.
-                - 'apartment_test': Test data for apartment rents.
+                - 'fish_data': Filtered fish datasets with selected species and columns.
+                - 'fish_prediction': Prediction datasets for fish.
+                - 'iris_train': Training datasets for Iris.
+                - 'iris_prediction': Prediction (test) datasets for Iris.
+                - 'apartment_train': Training datasets for apartment rents.
+                - 'apartment_test': Test datasets for apartment rents.
         """
         # Call private methods to load individual datasets
         fish_data, fish_prediction = self._get_fish_data(num_points)
@@ -83,7 +83,7 @@ class GetData:
     def _get_fish_data(self, num_points=5):
         """
         Randomly select one species and one Length column (keeping Width, Height, and Weight)
-        from the fish dataset, return a filtered DataFrame, and generate prediction data.
+        from the fish dataset, return a filtered DataFrame, and generate prediction datasets.
 
         Args:
             num_points (int): Number of prediction points to generate.
@@ -91,7 +91,7 @@ class GetData:
         Returns:
             dict: A dictionary containing:
                 - "fish_data": Filtered DataFrame with the selected species and columns.
-                - "fish_prediction": DataFrame with generated prediction data.
+                - "fish_prediction": DataFrame with generated prediction datasets.
         """
         # Load the fish dataset
         df = pd.read_csv("hf://datasets/scikit-learn/Fish/Fish.csv")
@@ -123,20 +123,20 @@ class GetData:
             selected_length: generated_lengths
         })
 
-        # Return both fish data and prediction data
+        # Return both fish datasets and prediction datasets
         return fish_data.reset_index(drop=True), prediction_df
 
     def _get_iris_data(self, test_size=0.05):
         """
-        Load the Iris dataset, split it into training and test sets, and prepare prediction data.
+        Load the Iris dataset, split it into training and test sets, and prepare prediction datasets.
 
         Args:
             test_size (float): Proportion of the dataset to include in the test split.
 
         Returns:
             tuple: A tuple containing:
-                - pd.DataFrame: Training data with the target column.
-                - pd.DataFrame: Prediction data (test set without the target column).
+                - pd.DataFrame: Training datasets with the target column.
+                - pd.DataFrame: Prediction datasets (test set without the target column).
         """
         # Load the Iris dataset
         iris = load_iris()
@@ -156,12 +156,12 @@ class GetData:
         # Create the prediction set by removing the target column from the test set
         iris_prediction = iris_test.drop(columns=["target"])
 
-        # Return both training data and prediction data
+        # Return both training datasets and prediction datasets
         return iris_train, iris_prediction
 
     def _get_apartment_rents(self, num_apartments=10, test_size=0.2):
         """
-        Generate synthetic data for apartment rents with increments of 100 baht and split into training and test sets.
+        Generate synthetic datasets for apartment rents with increments of 100 baht and split into training and test sets.
 
         Args:
             num_apartments (int): Total number of rows to generate.
