@@ -7,6 +7,7 @@
 __author__ = "Kyle Vitautas Lopin"
 
 # standard libraries
+importlib
 import random
 
 # installed libraries
@@ -37,7 +38,7 @@ class GetData:
         _get_iris_data(test_size=0.05):
             Load the Iris dataset, split it into training and test sets, and prepare prediction datasets.
     """
-    def __init__(self, seed):
+    def __init__(self, seed, dateset: str, **kwargs):
         """
         Initialize the GetData class with a random generator.
 
@@ -46,39 +47,28 @@ class GetData:
         """
         self.random_gen = random.Random(seed)  # Create an isolated random generator
 
-    def load_data(self, num_points=5, test_size=0.05, num_apartments=10, rent_test_size=0.2):
-        """
-        Load and prepare all necessary datasets (Fish, Iris, and Apartment Rents) in one call.
+    def load_data(self):
+        dataset_loader = self._get_dataset_loader()
+        if dataset_loader:
+            return dataset_loader(self.random_gen, **self.kwargs)
+        else:
+            raise ValueError(f"Dataset '{self.dataset_type}' is not supported.")
 
-        Args:
-            num_points (int): Number of prediction points to generate for Fish.
-            test_size (float): Proportion of the Iris dataset to include in the test split.
-            num_apartments (int): Number of rows to generate for the Apartment Rents dataset.
-            rent_test_size (float): Proportion of the Apartment Rents dataset to include in the test split.
+    def _get_dataset_loader(self):
+        """
+        Dynamically load the appropriate dataset module based on `dataset_type`.
 
         Returns:
-            dict: A dictionary containing the prepared datasets:
-                - 'fish_data': Filtered fish datasets with selected species and columns.
-                - 'fish_prediction': Prediction datasets for fish.
-                - 'iris_train': Training datasets for Iris.
-                - 'iris_prediction': Prediction (test) datasets for Iris.
-                - 'apartment_train': Training datasets for apartment rents.
-                - 'apartment_test': Test datasets for apartment rents.
+            function: A function that loads and processes the dataset.
         """
-        # Call private methods to load individual datasets
-        fish_data, fish_prediction = self._get_fish_data(num_points)
-        iris_train, iris_prediction = self._get_iris_data(test_size)
-        apartment_train, apartment_test = self._get_apartment_rents(num_apartments, rent_test_size)
-
-        # Return all datasets in a dictionary
-        return {
-            "fish_data": fish_data,
-            "fish_prediction": fish_prediction,
-            "iris_train": iris_train,
-            "iris_prediction": iris_prediction,
-            "apartment_train": apartment_train,
-            "apartment_prediction": apartment_test,
-        }
+        try:
+            # Import dataset processing module dynamically
+            dataset_module = importlib.import_module(
+                f"utility_functions.get_{self.dataset_type}_data")
+            return dataset_module.load_dataset  # Ensure each module has a `load_dataset()` function
+        except ModuleNotFoundError:
+            print(f"⚠️ Warning: Dataset module 'get_{self.dataset_type}_data' not found.")
+            return None
 
     def _get_fish_data(self, num_points=5):
         """
@@ -199,8 +189,12 @@ class GetData:
         return train_data.reset_index(drop=True), test_data.reset_index(drop=True)
 
 
+
+
 def check_loaded():
     print("\n\n\n\n================Loaded properly !!! ================ \n")
+
+
 
 
 # Example Usage
