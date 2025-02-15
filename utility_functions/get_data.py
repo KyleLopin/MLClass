@@ -207,7 +207,6 @@ def check_loaded():
     import ipywidgets as widgets
     from IPython.display import display, clear_output
     import random
-    from utility_functions.get_data import GetData
     print("\n\n\n\n================Loaded properly !!! ================ \n")
 
 
