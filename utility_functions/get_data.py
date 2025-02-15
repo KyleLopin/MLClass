@@ -200,7 +200,7 @@ class GetData:
 
 
 def check_loaded():
-    print("Loaded properly\n")
+    print("\n\n\n\n================Loaded properly !!! ================ \n")
 
 
 # Example Usage
