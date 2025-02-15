@@ -199,6 +199,10 @@ class GetData:
         return train_data.reset_index(drop=True), test_data.reset_index(drop=True)
 
 
+def check_loaded():
+    print("Loaded properly\n")
+
+
 # Example Usage
 if __name__ == '__main__':
     getdata = GetData(43)
