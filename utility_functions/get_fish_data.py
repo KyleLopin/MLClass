@@ -62,8 +62,11 @@ def get_fish_data(random_gen: random.Random, dataset: str,
         model = LinearRegression()
         model.fit(df_species[["Length3"]], df_species["Weight"])
 
-        # Predict weights for the selected lengths
-        predicted_weights = model.predict([[length] for length in random_lengths])
+        # Convert `random_lengths` to a DataFrame with correct column name
+        random_lengths_df = pd.DataFrame(random_lengths, columns=["Length3"])
+
+        # Predict weights
+        predicted_weights = model.predict(random_lengths_df)
 
         # Select a random price per 100g (100-300 Baht)
         price_per_100g = random_gen.uniform(100, 300)

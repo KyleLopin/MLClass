@@ -201,12 +201,7 @@ class GetData:
         return train_data.reset_index(drop=True), test_data.reset_index(drop=True)
 
 
-
-
 def check_loaded():
-    import ipywidgets as widgets
-    from IPython.display import display, clear_output
-    import random
     print("\n\n\n\n================Loaded properly !!! ================ \n")
 
 
