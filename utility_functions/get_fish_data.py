@@ -56,7 +56,7 @@ def get_fish_data(random_gen: random.Random, dataset: str,
         min_length, max_length = df_species["Length3"].min(), df_species["Length3"].max()
 
         # Randomly select `num_points` lengths within this range
-        random_lengths = [random_gen.uniform(min_length, max_length) for _ in range(num_points)]
+        random_lengths = [round(random_gen.uniform(min_length, max_length), 1) for _ in range(num_points)]
 
         # Train Linear Regression model
         model = LinearRegression()
@@ -69,7 +69,7 @@ def get_fish_data(random_gen: random.Random, dataset: str,
         predicted_weights = model.predict(random_lengths_df)
 
         # Select a random price per 100g (100-300 Baht)
-        price_per_100g = random_gen.uniform(100, 300)
+        price_per_100g = random_gen.randint(10, 30) * 10
 
         # Compute total cost (convert weight to grams, multiply by price per 100g)
         total_cost = sum(predicted_weights) * (price_per_100g / 100)
