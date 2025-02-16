@@ -111,7 +111,6 @@ def create_document(student_name: str, output_file: str,
     for label, items in zip(["problem", "answer"], [problems, answers]):
         for i, item in enumerate(items):
             placeholder = f"{{{label}{i+1}}}"
-            print('foo: ', placeholder)
 
             for paragraph in doc.paragraphs:
                 paragraph.text = paragraph.text.replace(placeholder, item)
@@ -186,6 +185,7 @@ if __name__ == '__main__':
 
     # make document
     doc_table = {"{Table 1}": [weight_table, ""]}
+    
     create_document(student_name, "fish_assignment.docx",
                     "fish_regression_intro",
                     problems=[questions[0][0], questions[1][0]],
