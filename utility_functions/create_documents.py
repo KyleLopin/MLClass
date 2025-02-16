@@ -67,22 +67,33 @@ def insert_table_at_paragraph(doc, paragraph, df, extra_column_name="Prediction"
     parent_element.getparent().remove(parent_element)
 
 
-def create_document(student_name: str, tables: dict, output_file="midterm.docx") -> None:
+def create_document(student_name: str, output_file: str,
+                    template_name: str,
+                    tables: dict = {},
+                    problems: list = [],
+                    answers: list = []) -> None:
     """
-    Create a Word document with tables for fish and iris prediction datasets for a student.
+    Create a Word document for a student using a template, replacing placeholders
+    with provided problem descriptions, answers, and tables.
 
     Args:
-        student_name (str): The name of the student.
+        student_name (str): The student's name.
         tables (dict): Dictionary of placeholders and DataFrames to replace them with.
-                       (e.g., {"{Table 1}": df1, "{Table 2}": df2}).
+        template_name (str): Name of the template in the pickle file.
         output_file (str): Name of the output Word document.
+        problems (list): List of problem descriptions.
+        answers (list): List of answers corresponding to each problem.
     """
 
-    template_file = Path(__file__).parent.parent / "templates" / "templates.pkl"
+    template_file = Path(__file__).parent / "templates" / "templates.pkl"
     # get document from templates
     with open(template_file, "rb") as file:
         templates = pickle.load(file)
-    doc = templates["midterm jan 25"]
+
+    if template_name not in templates:
+        raise ValueError(f"Template '{template_name}' not found in templates.pkl.")
+
+    doc = templates[template_name]
 
     # Load the binary data into a Document object, make it harder for students to read
     if isinstance(doc, bytes):
@@ -92,6 +103,15 @@ def create_document(student_name: str, tables: dict, output_file="midterm.docx")
     for paragraph in doc.paragraphs:
         if "{Name}" in paragraph.text:
             paragraph.text = paragraph.text.replace("{Name}", student_name)
+
+    # Loop through problems and replace `{problem1}`, `{problem2}`, etc.
+    for i, (problem_text, answer_text) in enumerate(zip(problems, answers)):
+        problem_placeholder = "{{problem{}}}".format(i+1)
+        answer_placeholder = "{{answer{}}}".format(i+1)
+
+        for paragraph in doc.paragraphs:
+            paragraph.text = paragraph.text.replace(problem_placeholder, problem_text)
+            paragraph.text = paragraph.text.replace(answer_placeholder, answer_text)
 
     # Replace table placeholders with actual tables
     for table_placeholder, (df, target_column_name) in tables.items():
@@ -106,7 +126,7 @@ def create_document(student_name: str, tables: dict, output_file="midterm.docx")
     print(f"Document saved as: {student_name}_{output_file}")
 
 
-if __name__ == '__main__':
+def test_midterm_2025():
     # Example fish prediction data (excluding Weight)
     fish_prediction_data = pd.DataFrame({
         "Length": [30.1, 31.5, 29.8, 32.2, 30.7],
@@ -127,3 +147,24 @@ if __name__ == '__main__':
 
     # Create the document
     create_document(_student_name, _tables)
+
+
+if __name__ == '__main__':
+    fish_prediction_data = pd.DataFrame({
+        "Fish number": ["Fish 1", "Fish 2", "Fish 3"],
+        "Length": [30.1, 31.5, 29.8],
+    })
+
+    _tables = {"{Table 1}": [fish_prediction_data, ""]}
+
+    # Create the document
+    create_document("Kyle", "test.docx",
+                    "fish_regression_intro", _tables,
+                    problems=[f"For the fish species Test.\n"
+                               "\nWhat the average increase in weight for a "
+                               "1 cm increase in its length: ",
+                              f"What is the total cost for all of the Test_specis listed below, "
+                              f"if the fish cost _prie baht per 100 grams"],
+                    answers=["46", "938"])
+
+
