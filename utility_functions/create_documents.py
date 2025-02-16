@@ -71,7 +71,8 @@ def create_document(student_name: str, output_file: str,
                     template_name: str,
                     tables: dict = {},
                     problems: list = [],
-                    answers: list = []) -> None:
+                    answers: list = [],
+                    debug: bool = False) -> None:
     """
     Create a Word document for a student using a template, replacing placeholders
     with provided problem descriptions, answers, and tables.
@@ -84,7 +85,9 @@ def create_document(student_name: str, output_file: str,
         problems (list): List of problem descriptions.
         answers (list): List of answers corresponding to each problem.
     """
-
+    if debug:
+        print(f"make document with parameters: template_name - {template_name}, "
+              f"problems: {problems}")
     template_file = Path(__file__).parent / "templates" / "templates.pkl"
     # get document from templates
     with open(template_file, "rb") as file:
