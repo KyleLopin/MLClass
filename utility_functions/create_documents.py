@@ -108,13 +108,13 @@ def create_document(student_name: str, output_file: str,
             paragraph.text = paragraph.text.replace("{Name}", student_name)
 
     # Loop through problems and replace `{problem1}`, `{problem2}`, etc.
-    for i, (problem_text, answer_text) in enumerate(zip(problems, answers)):
-        problem_placeholder = "{{problem{}}}".format(i+1)
-        answer_placeholder = "{{answer{}}}".format(i+1)
+    for label, items in zip(["problem", "answer"], [problems, answers]):
+        for i, item in enumerate(items):
+            placeholder = f"{{{label}{i+1}}}"
+            print('foo: ', placeholder)
 
-        for paragraph in doc.paragraphs:
-            paragraph.text = paragraph.text.replace(problem_placeholder, problem_text)
-            paragraph.text = paragraph.text.replace(answer_placeholder, answer_text)
+            for paragraph in doc.paragraphs:
+                paragraph.text = paragraph.text.replace(placeholder, item)
 
     # Replace table placeholders with actual tables
     for table_placeholder, (df, target_column_name) in tables.items():
@@ -161,13 +161,35 @@ if __name__ == '__main__':
     _tables = {"{Table 1}": [fish_prediction_data, ""]}
 
     # Create the document
-    create_document("Kyle", "test.docx",
-                    "fish_regression_intro", _tables,
-                    problems=[f"For the fish species Test.\n"
-                               "\nWhat the average increase in weight for a "
-                               "1 cm increase in its length: ",
-                              f"What is the total cost for all of the Test_specis listed below, "
-                              f"if the fish cost _prie baht per 100 grams"],
-                    answers=["46", "938"])
+    # create_document("Kyle", "test.docx",
+    #                 "fish_regression_intro", _tables,
+    #                 problems=[f"For the fish species Test.\n"
+    #                            "\nWhat the average increase in weight for a "
+    #                            "1 cm increase in its length: ",
+    #                           f"What is the total cost for all of the Test_specis listed below, "
+    #                           f"if the fish cost _prie baht per 100 grams"],
+    #                 answers=["46", "938"])
+
+    student_name = "Kyle"
+    species2 = "Bream"
+    weight_coefficient = 2
+    species1 = "Pike"
+    price = 100
+    cost = 5
+    weight_table = fish_prediction_data
+    questions = [(f"For the fish species {species2}.\n"
+                  "\nWhat is the average increase in weight for a "
+                  "1 cm increase in its length: ", weight_coefficient),
+                 (f"What is the total cost for all of the {species1} listed below, "
+                  f"if the fish cost {price} baht per 100 grams",
+                  cost, weight_table)]
+
+    # make document
+    doc_table = {"{Table 1}": [weight_table, ""]}
+    create_document(student_name, "fish_assignment.docx",
+                    "fish_regression_intro",
+                    problems=[questions[0][0], questions[1][0]],
+                    tables=doc_table)
+
 
 
