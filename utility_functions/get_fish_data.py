@@ -10,6 +10,7 @@ __author__ = "Kyle Vitautas Lopin"
 import random
 
 # installed libraries
+import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
@@ -76,7 +77,41 @@ def get_fish_data(random_gen: random.Random, dataset: str,
 
         return selected_fish, random_lengths, price_per_100g, total_cost
 
+    elif dataset == "fish syn":
+        """
+            Generates synthetic fish data by averaging two randomly chosen fish 
+            from ['Parkki', 'Pike', 'Bream'].
+
+            Args:
+                df (pd.DataFrame): The original fish dataset.
+                num_points (int): Number of synthetic fish to generate.
+
+            Returns:
+                pd.DataFrame: A DataFrame containing the synthetic fish data.
+            """
+        target_species = ['Parkki', 'Pike', 'Bream']
+        features = ["Length1", "Length2", "Length3", "Height", "Width"]
+
+        synthetic_fish = []
+
+        for _ in range(num_points):
+            # Randomly select two fish from the target species
+            species_selected = np.random.choice(target_species, size=2, replace=True)
+            selected_fish = df[df["Species"].isin(species_selected)].sample(n=2, replace=True)
+
+            # Compute the average of the two fish attributes
+            new_fish = selected_fish[features].mean().to_dict()
+
+            synthetic_fish.append(new_fish)
+
+        return pd.DataFrame(synthetic_fish).round(1)
+
     else:
         raise ValueError(
             f"Unsupported dataset type: {dataset}. Choose 'fish coeff' or 'fish cost'.")
 
+
+if __name__ == '__main__':
+    df = pd.read_csv("hf://datasets/scikit-learn/Fish/Fish.csv")
+    synthetic_x = get_fish_data(random.Random(), "fish syn", num_points=2)
+    print(synthetic_x)

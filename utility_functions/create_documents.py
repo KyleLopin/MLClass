@@ -156,9 +156,25 @@ if __name__ == '__main__':
         "Fish number": ["Fish 1", "Fish 2", "Fish 3"],
         "Length": [30.1, 31.5, 29.8],
     })
+    df = pd.read_csv("hf://datasets/scikit-learn/Fish/Fish.csv")
+    import random, get_fish_data
+    synthetic_x = get_fish_data.get_fish_data(random.Random(), "fish syn", num_points=2)
+    print(synthetic_x)
 
-    _tables = {"{Table 1}": [fish_prediction_data, ""]}
+    weight_table = {"{Table 1}": [synthetic_x, "Species"]}
 
+    questions = [(f"Fill in the table with the species of fish each entry belongs to.",
+                  weight_table)]
+
+    # make document
+
+    doc_table = {"{Table 1}": [weight_table, ""]}
+    student_name = "Kyle"
+    create_document(student_name, "fish_classification.docx",
+                    "fish_classify_intro",
+                    problems=[questions[0][0]],
+                    tables=weight_table)
+    ham
     # Create the document
     # create_document("Kyle", "test.docx",
     #                 "fish_regression_intro", _tables,
@@ -175,21 +191,7 @@ if __name__ == '__main__':
     species1 = "Pike"
     price = 100
     cost = 5
-    weight_table = fish_prediction_data
-    questions = [(f"For the fish species {species2}.\n"
-                  "\nWhat is the average increase in weight for a "
-                  "1 cm increase in its length: ", weight_coefficient),
-                 (f"What is the total cost for all of the {species1} listed below, "
-                  f"if the fish cost {price} baht per 100 grams",
-                  cost, weight_table)]
 
-    # make document
-    doc_table = {"{Table 1}": [weight_table, ""]}
-    
-    create_document(student_name, "fish_assignment.docx",
-                    "fish_regression_intro",
-                    problems=[questions[0][0], questions[1][0]],
-                    tables=doc_table)
 
 
 

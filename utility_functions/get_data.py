@@ -208,6 +208,9 @@ def check_loaded():
 # Example Usage
 if __name__ == '__main__':
     getdata = GetData(43)
+    dataset = getdata.load_data("fish syn", num_points=2)
+    print(dataset)
+
     dataset = getdata.load_data("fish coeff")
     print(dataset)
     dataset = getdata.load_data("fish cost")
