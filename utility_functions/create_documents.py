@@ -94,6 +94,7 @@ def create_document(student_name: str, output_file: str,
         templates = pickle.load(file)
 
     if template_name not in templates:
+        print(f"template keys: {templates.keys()}")
         raise ValueError(f"Template '{template_name}' not found in templates.pkl.")
 
     doc = templates[template_name]
