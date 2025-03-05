@@ -62,7 +62,7 @@ class GetData:
             tuple: Processed datasets .
         """
         if "fish" in dataset_loader:
-            return get_fish_data.get_fish_data(self.random_gen, dataset_loader)
+            return get_fish_data.get_fish_data(self.random_gen, dataset_loader, kwargs)
         else:
             raise ValueError(f"Dataset '{dataset_loader}' is not supported.")
 
