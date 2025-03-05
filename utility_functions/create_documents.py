@@ -53,7 +53,7 @@ def insert_table_at_paragraph(doc, paragraph, df, extra_column_name="Prediction"
         hdr_cells[i].text = str(column)
     hdr_cells[len(df.columns)].text = extra_column_name  # Add the extra column name
 
-    # Add the data rows
+    # Add the datasets rows
     for _, row in df.iterrows():
         row_cells = table.add_row().cells
         for i, value in enumerate(row):
@@ -99,7 +99,7 @@ def create_document(student_name: str, output_file: str,
 
     doc = templates[template_name]
 
-    # Load the binary data into a Document object, make it harder for students to read
+    # Load the binary datasets into a Document object, make it harder for students to read
     if isinstance(doc, bytes):
         doc = Document(BytesIO(doc))
 
@@ -130,12 +130,12 @@ def create_document(student_name: str, output_file: str,
 
 
 def test_midterm_2025():
-    # Example fish prediction data (excluding Weight)
+    # Example fish prediction datasets (excluding Weight)
     fish_prediction_data = pd.DataFrame({
         "Length": [30.1, 31.5, 29.8, 32.2, 30.7],
     })
 
-    # Example iris prediction data (excluding Target)
+    # Example iris prediction datasets (excluding Target)
     iris_prediction_data = pd.DataFrame({
         "sepal length (cm)": [5.1, 5.5, 6.0, 6.2, 5.8],
         "sepal width (cm)": [3.5, 3.8, 3.2, 3.0, 3.3],
@@ -145,7 +145,7 @@ def test_midterm_2025():
 
     # Student name
     _student_name = "John Doe"
-    _tables = {"{Table 1}": [fish_prediction_data, "Predicted weight (grams)"],
+    _tables = {"{Table 1}": [fish_prediction_data, "Predicted species"],
                "{Table 2}": [iris_prediction_data, "Predicted species"]}
 
     # Create the document
@@ -159,19 +159,18 @@ if __name__ == '__main__':
     })
     df = pd.read_csv("hf://datasets/scikit-learn/Fish/Fish.csv")
     import random, get_fish_data
-    synthetic_x = get_fish_data.get_fish_data(random.Random(), "fish syn", num_points=2)
+    synthetic_x = get_fish_data.get_fish_data(random.Random(), "fish syn", num_points=6)
     print(synthetic_x)
 
     weight_table = {"{Table 1}": [synthetic_x, "Species"]}
 
-    questions = [(f"Fill in the table with the species of fish each entry belongs to.",
+    questions = [(f"Fill in the table with the species and weight of fish for each entry.",
                   weight_table)]
-
     # make document
 
     doc_table = {"{Table 1}": [weight_table, ""]}
     student_name = "Kyle"
-    create_document(student_name, "fish_classification.docx",
+    create_document(student_name, "final_review_2025.docx",
                     "fish_classify_intro",
                     problems=[questions[0][0]],
                     tables=weight_table)
