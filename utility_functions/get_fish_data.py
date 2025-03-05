@@ -96,7 +96,7 @@ def get_fish_data(random_gen: random.Random, dataset: str,
 
         for _ in range(num_points):
             # Randomly select two fish from the target species
-            species_selected = random_gen.choice(target_species, size=2, replace=True)
+            species_selected = random_gen.choices(target_species, k=num_points)
             selected_fish = df[df["Species"].isin(species_selected)].sample(n=2, replace=True)
 
             # Compute the average of the two fish attributes
