@@ -13,13 +13,15 @@ from tempfile import NamedTemporaryFile
 
 
 PICKLE_FILE = "templates.pkl"
-DOC_FILE = "fish_regression_intro.docx"
+PICKLE_KEY = "midterm_review_25"
+DOC_FILE = f"{PICKLE_KEY}.docx"
 
 
 # Read existing data
 if os.path.exists(PICKLE_FILE):
     with open(PICKLE_FILE, "rb") as file:
         templates = pickle.load(file)
+        print(templates.keys())
 else:  # use empty template
     templates = {}
 
@@ -27,7 +29,7 @@ else:  # use empty template
 with open(DOC_FILE, "rb") as docx_file:
     docx_data = docx_file.read()
 # add to template
-templates["fish_regression_intro"] = docx_data
+templates[PICKLE_KEY] = docx_data
 
 # Step 3: Write to a temporary file
 with NamedTemporaryFile("wb", delete=False) as temp_file:

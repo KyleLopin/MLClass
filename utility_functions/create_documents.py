@@ -40,25 +40,31 @@ def insert_table_at_paragraph(doc, paragraph, df, extra_column_name="Prediction"
         df (pd.DataFrame): The DataFrame to convert into a table.
         extra_column_name (str): Name of the extra column to add to the table.
     """
+    # Ensure extra_column_name is a list
+    if isinstance(extra_column_name, str):
+        extra_column_name = [extra_column_name]  # Convert single name to list
+
     # Get the parent element of the paragraph
     parent_element = paragraph._element
 
     # Add a new table with an extra column for the Prediction
-    table = doc.add_table(rows=1, cols=len(df.columns) + 1)
+    table = doc.add_table(rows=1, cols=len(df.columns) + len(extra_column_name))
     table.style = "Table Grid"
 
-    # Add the header row, including the extra column
+    # Add the header row
     hdr_cells = table.rows[0].cells
     for i, column in enumerate(df.columns):
         hdr_cells[i].text = str(column)
-    hdr_cells[len(df.columns)].text = extra_column_name  # Add the extra column name
+    for j, extra_col in enumerate(extra_column_name):
+        hdr_cells[len(df.columns) + j].text = extra_col  # Add multiple extra column names
 
-    # Add the datasets rows
+    # Add the dataset rows
     for _, row in df.iterrows():
         row_cells = table.add_row().cells
         for i, value in enumerate(row):
             row_cells[i].text = str(value)
-        row_cells[len(df.columns)].text = ""  # Leave the extra column blank
+        for j in range(len(extra_column_name)):  # Add empty cells for extra columns
+            row_cells[len(df.columns) + j].text = ""
 
     # Insert the table into the document at the correct location
     parent_element.addnext(table._element)
@@ -158,21 +164,26 @@ if __name__ == '__main__':
         "Length": [30.1, 31.5, 29.8],
     })
     df = pd.read_csv("hf://datasets/scikit-learn/Fish/Fish.csv")
-    import random, get_fish_data
+    import random, get_fish_data, get_data
+    data_gen = get_data.GetData(43)
+
     synthetic_x = get_fish_data.get_fish_data(random.Random(), "fish syn", num_points=6)
     print(synthetic_x)
+    species2, _ = data_gen.load_data("fish coeff")
 
-    weight_table = {"{Table 1}": [synthetic_x, "Species"]}
+    weight_table = {"{Table 1}": [synthetic_x, ["Species", "Weight"]]}
 
     questions = [(f"Fill in the table with the species and weight of fish for each entry.",
-                  weight_table)]
+                  weight_table), (f"For the fish species {species2}.\n"
+                  "\nWhat is the average increase in weight for a "
+                  "1 cm increase in its length: ")]
     # make document
 
     doc_table = {"{Table 1}": [weight_table, ""]}
     student_name = "Kyle"
     create_document(student_name, "final_review_2025.docx",
-                    "fish_classify_intro",
-                    problems=[questions[0][0]],
+                    "midterm_review_25",
+                    problems=[questions[0][0], questions[1]],
                     tables=weight_table)
     ham
     # Create the document

@@ -93,7 +93,8 @@ def get_fish_data(random_gen: random.Random, dataset: str,
         features = ["Length1", "Length2", "Length3", "Height", "Width"]
 
         synthetic_fish = []
-        num_points = num_points['num_points']
+        if isinstance(num_points, dict):
+            num_points = num_points['num_points']
         for _ in range(num_points):
             # Randomly select two fish from the target species
             species_selected = random_gen.choices(target_species, k=2)
