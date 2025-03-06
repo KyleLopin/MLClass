@@ -16,7 +16,7 @@ PICKLE_FILE = "templates.pkl"
 DOC_FILE = "midterm.docx"
 
 
-# Read existing data
+# Read existing datasets
 if os.path.exists(PICKLE_FILE):
     with open(PICKLE_FILE, "rb") as file:
         templates = pickle.load(file)
