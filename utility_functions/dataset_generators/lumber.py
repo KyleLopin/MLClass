@@ -107,8 +107,6 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
         # Create DataFrame dynamically
 
         df_logs = pd.DataFrame(features_scaled)
-        print(df_logs.shape)
-        print(len(species))
         df_logs["Species"] = species
         df_logs["Lumber Yield (kg)"] = lumber_yield.round()
 
