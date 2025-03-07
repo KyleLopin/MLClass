@@ -54,19 +54,22 @@ class GetData:
         """
         self.random_gen = random.Random(seed)  # Create an isolated random generator
 
-    def load_data(self, dataset_loader: str, **kwargs):
+    def load_data(self, dataset_loader: str,
+                  debug: bool = False, **kwargs):
         """
         Load and prepare the dataset based on the specified dataset type.
 
         Args:
-            dataset_type (str): The dataset to load (e.g., "fish", "iris", "weather").
+            dataset_loader (str): The dataset to load (e.g., "fish", "iris", "weather").
+            debug (bool): Flag to print random_gen state and test values
             **kwargs: Additional arguments for dataset processing (e.g., date, test_size).
 
         Returns:
             tuple: Processed datasets .
         """
-        print(f"🔹 Random state: {self.random_gen.getstate()[1][:5]}")  # Show first few state values
-        print("Random values from getdata1:", [self.random_gen.randint(0, 100) for _ in range(5)])
+        if debug:
+            print(f"🔹 Random state: {self.random_gen.getstate()[1][:5]}")  # Show first few state values
+            print("Random values from getdata1:", [self.random_gen.randint(0, 100) for _ in range(5)])
         if "fish" in dataset_loader:
             return get_fish_data.get_fish_data(self.random_gen, dataset_loader, **kwargs)
         if "tree" in dataset_loader:
