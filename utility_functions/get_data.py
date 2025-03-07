@@ -65,6 +65,8 @@ class GetData:
         Returns:
             tuple: Processed datasets .
         """
+        print(f"🔹 Random state: {self.random_gen.getstate()[1][:5]}")  # Show first few state values
+        print("Random values from getdata1:", [self.random_gen.randint(0, 100) for _ in range(5)])
         if "fish" in dataset_loader:
             return get_fish_data.get_fish_data(self.random_gen, dataset_loader, **kwargs)
         if "tree" in dataset_loader:
@@ -215,9 +217,9 @@ def check_loaded():
 # Example Usage
 if __name__ == '__main__':
     getdata = GetData(43)
-    dataset = getdata.load_data("fish syn", num_points=2)
+    dataset = getdata.load_data("fish syn", num_points=6)
     print(dataset)
-
+    ham
     dataset = getdata.load_data("fish coeff")
     print(dataset)
     dataset = getdata.load_data("fish cost")

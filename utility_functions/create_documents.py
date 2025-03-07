@@ -167,8 +167,9 @@ if __name__ == '__main__':
     import random, get_fish_data, get_data
     data_gen = get_data.GetData(43)
 
-    synthetic_x = get_fish_data.get_fish_data(random.Random(), "fish syn", num_points=6)
+    synthetic_x = data_gen.load_data("fish syn", num_points=6)
     print(synthetic_x)
+
     species2, _ = data_gen.load_data("fish coeff")
 
     weight_table = {"{Table 1}": [synthetic_x, ["Species", "Weight"]]}
