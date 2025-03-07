@@ -33,10 +33,28 @@ def scale_feature(value, feature_range):
     std_dev = (feature_range[1] - feature_range[0]) / 4  # Approximate std dev
     return mean + value * std_dev
 
+
+def get_wood_prices(random_gen: random.Random):
+    """Generate random wood prices per metric ton within specified ranges."""
+    price_ranges = {
+        "Teak": (23000, 29000),  # Convert from THB/kg to THB/metric ton
+        "Siamese Rosewood": (140000, 160000),
+        "Bullet Wood": (16000, 20000),
+        "Red Cedar": (8000, 10000),
+        "Tenasserim Pine": (6000, 8000),
+    }
+
+    # Randomly sample a price within the given range, round to the nearest 100 THB, and convert to int
+    wood_prices = {wood: int(round(random_gen.uniform(*price_range), -2)) for
+                   wood, price_range in price_ranges.items()}
+
+    return wood_prices
+
+
 def get_lumber_data(random_gen: random.Random, dataset: str,
                     num_points: int = 3, noise_level: float = 0.05,
                     test_size: int = 0, **kwargs):
-    num_samples = num_points# +test_size
+    num_samples = num_points+test_size
     if "class and regr" in dataset:
         # Generate classification dataset (5 classes)
         X, y = make_classification(
@@ -111,39 +129,23 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
 
         # Split into training and test sets
         if test_size > 0:
-            # Split raw numerical data BEFORE assigning species names
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=test_size, stratify=y, random_state=random_gen.randint(1, 10000)
+            df_train, df_test = train_test_split(
+                df_logs, test_size=test_size/num_samples,
+                random_state=random_gen.randint(1, 10000), shuffle=False
             )
 
-            # Now assign species based on y_train and y_test
-            species_train = [thai_tree_species[label] for label in y_train]
-            species_test = [thai_tree_species[label] for label in y_test]
-
-            # Ensure correct assignment when creating DataFrames
-            df_train = pd.DataFrame(X_train,
-                                    columns=["Log Diameter (cm)", "Log Length (m)", "Taper (cm/m)",
-                                             "Bark Thickness (cm)"])
-            df_test = pd.DataFrame(X_test,
-                                   columns=["Log Diameter (cm)", "Log Length (m)", "Taper (cm/m)",
-                                            "Bark Thickness (cm)"])
-
-            df_train["Species"] = species_train
-            df_test[
-                "Species"] = species_test  # Only for verification, later remove Species from df_test
-
             # Remove species and lumber yield from test set
-            df_test = df_test.drop(columns=["Species", "Lumber Yield (kg)"], errors="ignore")
-
-            return df_train, df_test
+            df_test = df_test.drop(columns=["Species", "Lumber Yield (kg)"])
+            return df_train, df_test, get_wood_prices(random_gen)
 
         return df_logs, None
 
 
 if __name__ == '__main__':
-    df_logs, df_test = get_lumber_data(random.Random(), "Thai trees class and regr",
-                                       num_points=300, test_size=0)
-
+    df_logs, df_test, prices = get_lumber_data(random.Random(),
+                                               "Thai trees class and regr",
+                                               num_points=300, test_size=10)
+    print(prices)
     print(df_test)
     print('====')
     print(df_logs)

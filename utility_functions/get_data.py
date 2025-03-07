@@ -217,6 +217,10 @@ def check_loaded():
 # Example Usage
 if __name__ == '__main__':
     getdata = GetData(43)
+
+    dataset = getdata.load_data("Thai trees class and regr",
+                                       num_points=310, test_size=10)
+
     dataset = getdata.load_data("fish syn", num_points=6)
     print(dataset)
     ham
