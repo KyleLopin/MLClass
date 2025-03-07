@@ -16,7 +16,7 @@ from sklearn.linear_model import LinearRegression
 
 
 def get_fish_data(random_gen: random.Random, dataset: str,
-                 num_points: int = 3, **kwargs):
+                  num_points: int = 3, **kwargs):
     """
     Load the fish dataset.
 

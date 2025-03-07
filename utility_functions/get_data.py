@@ -1,7 +1,10 @@
 # Copyright (c) 2025 Kyle Lopin (Naresuan University) <kylel@nu.ac.th>
 
 """
-
+Call this function to get dataset for topics.
+the class GetData will initialize the random generator with a seed to insure consistency if needed.
+The method GetData.load_data will fetch the specified data type for the other files used to
+generate the data.
 """
 
 __author__ = "Kyle Vitautas Lopin"
@@ -17,6 +20,7 @@ from sklearn.model_selection import train_test_split
 
 # local files
 import get_fish_data
+from utility_functions.dataset_generators import lumber
 
 
 class GetData:
@@ -62,7 +66,10 @@ class GetData:
             tuple: Processed datasets .
         """
         if "fish" in dataset_loader:
-            return get_fish_data.get_fish_data(self.random_gen, dataset_loader, kwargs)
+            return get_fish_data.get_fish_data(self.random_gen, dataset_loader, **kwargs)
+        if "tree" in dataset_loader:
+            return lumber.get_lumber_data(self.random_gen, dataset_loader, **kwargs)
+
         else:
             raise ValueError(f"Dataset '{dataset_loader}' is not supported.")
 

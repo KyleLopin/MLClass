@@ -177,10 +177,11 @@ if __name__ == '__main__':
                   weight_table), (f"For the fish species {species2}.\n"
                   "\nWhat is the average increase in weight for a "
                   "1 cm increase in its length: ")]
-    # make document
+
 
     doc_table = {"{Table 1}": [weight_table, ""]}
-    student_name = "Kyle"
+    # student_name = "Kyle"
+    # make document
     create_document(student_name, "final_review_2025.docx",
                     "midterm_review_25",
                     problems=[questions[0][0], questions[1]],
