@@ -38,7 +38,7 @@ scaling_factors = {
 
 
 # Function to scale values using mean and std adjustment
-def scale_feature(value: float, feature_range: tuple(float, float)) -> float:
+def scale_feature(value: float, feature_range: tuple[float, float]) -> float:
     """
     Scale a feature value based on a given range, using mean and an estimated standard deviation.
 
