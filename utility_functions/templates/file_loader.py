@@ -13,7 +13,7 @@ from tempfile import NamedTemporaryFile
 
 
 PICKLE_FILE = "templates.pkl"
-PICKLE_KEY = "midterm_review_25"
+PICKLE_KEY = "Final_s25"
 DOC_FILE = f"{PICKLE_KEY}.docx"
 
 
