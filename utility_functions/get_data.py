@@ -33,17 +33,20 @@ class GetData:
     - Load the Iris dataset, split it into training and test sets, and prepare prediction datasets.
 
     Attributes:
-        random_gen (random.Random): A random number generator initialized with a seed to ensure reproducibility.
+        random_gen (random.Random): A random number generator initialized with
+        a seed to ensure reproducibility.
 
     Methods:
         load_data(num_points=5, test_size=0.05):
             Load and prepare all datasets (Fish and Iris) in one call.
 
         _get_fish_data(num_points=5):
-            Load the fish dataset, filter it by species and length column, and generate prediction datasets.
+            Load the fish dataset, filter it by species and length column,
+            and generate prediction datasets.
 
         _get_iris_data(test_size=0.05):
-            Load the Iris dataset, split it into training and test sets, and prepare prediction datasets.
+            Load the Iris dataset, split it into training and test sets,
+            and prepare prediction datasets.
     """
     def __init__(self, seed):
         """
@@ -52,6 +55,7 @@ class GetData:
         Args:
             seed (int): Seed for the random generator.
         """
+        self.dataset_type = None  # this might be deprecated, recheck on second draft
         self.random_gen = random.Random(seed)  # Create an isolated random generator
 
     def load_data(self, dataset_loader: str,
@@ -68,8 +72,10 @@ class GetData:
             tuple: Processed datasets .
         """
         if debug:
-            print(f"🔹 Random state: {self.random_gen.getstate()[1][:5]}")  # Show first few state values
-            print("Random values from getdata1:", [self.random_gen.randint(0, 100) for _ in range(5)])
+            # Show first few state values
+            print(f"🔹 Random state: {self.random_gen.getstate()[1][:5]}")
+            print("Random values from getdata1:",
+                  [self.random_gen.randint(0, 100) for _ in range(5)])
         if "fish" in dataset_loader:
             return get_fish_data.get_fish_data(self.random_gen, dataset_loader, **kwargs)
         if "tree" in dataset_loader:
@@ -129,7 +135,8 @@ class GetData:
 
         # Generate uniformly distributed random numbers for the length column
         generated_lengths = [
-            round(self.random_gen.uniform(length_values.min(), length_values.max()), 1) for _ in range(num_points)
+            round(self.random_gen.uniform(length_values.min(), length_values.max()), 1)
+            for _ in range(num_points)
         ]
 
         # Create a DataFrame with the generated lengths
@@ -142,7 +149,8 @@ class GetData:
 
     def _get_iris_data(self, test_size=0.05):
         """
-        Load the Iris dataset, split it into training and test sets, and prepare prediction datasets.
+        Load the Iris dataset, split it into training and test sets,
+        and prepare prediction datasets.
 
         Args:
             test_size (float): Proportion of the dataset to include in the test split.
@@ -160,7 +168,8 @@ class GetData:
 
         # Split the dataset into training and test sets
         train, test = train_test_split(
-            data, test_size=test_size, random_state=self.random_gen.randint(0, 2 ** 32 - 1)
+            data, test_size=test_size,
+            random_state=self.random_gen.randint(0, 2 ** 32 - 1)
         )
 
         # Store the splits
@@ -175,7 +184,8 @@ class GetData:
 
     def _get_apartment_rents(self, num_apartments=10, test_size=0.2):
         """
-        Generate synthetic datasets for apartment rents with increments of 100 baht and split into training and test sets.
+        Generate synthetic datasets for apartment rents with increments of 100 baht
+        and split into training and test sets.
 
         Args:
             num_apartments (int): Total number of rows to generate.
@@ -207,7 +217,8 @@ class GetData:
 
         # Split into training and test sets
         train_data, test_data = train_test_split(
-            apartment_rents, test_size=test_size, random_state=self.random_gen.randint(0, 2 ** 32 - 1)
+            apartment_rents, test_size=test_size,
+            random_state=self.random_gen.randint(0, 2 ** 32 - 1)
         )
 
         return train_data.reset_index(drop=True), test_data.reset_index(drop=True)
@@ -222,16 +233,16 @@ if __name__ == '__main__':
     getdata = GetData(43)
 
     dataset = getdata.load_data("Thai trees class and regr",
-                                       num_points=310, test_size=10)
-
-    dataset = getdata.load_data("fish syn", num_points=6)
-    print(dataset)
-    ham
-    dataset = getdata.load_data("fish coeff")
-    print(dataset)
-    dataset = getdata.load_data("fish cost")
-
-    print(dataset)
+                                num_points=310, test_size=10)
+    # print(dataset)
+    # dataset = getdata.load_data("fish syn", num_points=6)
+    # print(dataset)
+    #
+    # dataset = getdata.load_data("fish coeff")
+    # print(dataset)
+    # dataset = getdata.load_data("fish cost")
+    #
+    # print(dataset)
     #
     # print("Fish Data:")
     # print(datasets["fish_data"])
