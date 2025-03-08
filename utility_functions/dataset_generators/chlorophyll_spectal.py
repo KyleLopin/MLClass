@@ -41,7 +41,7 @@ def get_spectral_data(random_gen: random.Random):
 
     df_sensor = df_sensor[df_sensor["leaf"] == leaf]
 
-    return df_sensor
+    return df_sensor, sensor, leaf
 
 
 if __name__ == '__main__':
