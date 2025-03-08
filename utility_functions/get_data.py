@@ -20,7 +20,7 @@ from sklearn.model_selection import train_test_split
 
 # local files
 import get_fish_data
-from utility_functions.dataset_generators import lumber
+from utility_functions.dataset_generators import chlorophyll_spectal, lumber
 
 
 class GetData:
@@ -80,6 +80,8 @@ class GetData:
             return get_fish_data.get_fish_data(self.random_gen, dataset_loader, **kwargs)
         if "tree" in dataset_loader:
             return lumber.get_lumber_data(self.random_gen, dataset_loader, **kwargs)
+        if "chloro" in dataset_loader:
+            return chlorophyll_spectal.get_spectral_data(self.random_gen)
 
         else:
             raise ValueError(f"Dataset '{dataset_loader}' is not supported.")
