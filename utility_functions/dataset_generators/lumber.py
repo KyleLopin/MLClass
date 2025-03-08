@@ -38,14 +38,33 @@ scaling_factors = {
 
 
 # Function to scale values using mean and std adjustment
-def scale_feature(value, feature_range):
+def scale_feature(value: float, feature_range: tuple(float, float)) -> float:
+    """
+    Scale a feature value based on a given range, using mean and an estimated standard deviation.
+
+    Args:
+        value (float): The input feature value to be scaled.
+        feature_range (Tuple[float, float]): The (min, max) range of the feature.
+
+    Returns:
+        float: The scaled feature value.
+    """
     mean = (feature_range[0] + feature_range[1]) / 2
     std_dev = (feature_range[1] - feature_range[0]) / 4  # Approximate std dev
     return mean + value * std_dev
 
 
-def get_wood_prices(random_gen: random.Random):
-    """Generate random wood prices per metric ton within specified ranges."""
+def get_wood_prices(random_gen: random.Random) -> dict[str, int]:
+    """
+    Generate random wood prices per metric ton within specified ranges.
+
+    Args:
+        random_gen (random.Random): A random number generator instance for reproducibility.
+
+    Returns:
+        dict[str, int]: A dictionary where the keys are wood species names and the values are
+        randomly sampled prices in THB per metric ton, rounded to the nearest 100.
+    """
     price_ranges = {
         "Teak": (23000, 29000),  # Convert from THB/kg to THB/metric ton
         "Siamese Rosewood": (140000, 160000),
@@ -64,7 +83,21 @@ def get_wood_prices(random_gen: random.Random):
 
 def get_lumber_data(random_gen: random.Random, dataset: str,
                     num_points: int = 3, noise_level: float = 0.05,
-                    test_size: int = 0, **kwargs):
+                    test_size: int = 0, **kwargs
+                    ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, int]]:
+    """
+    Generate synthetic lumber dataset with classification and regression targets.
+
+    Args:
+        random_gen (random.Random): Random number generator instance for reproducibility.
+        dataset (str): Type of dataset to generate.
+        num_points (int): Number of training samples to generate.
+        noise_level (float): Amount of noise to add.
+        test_size (int): Number of test samples where species and yield are hidden.
+
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame, dict[str, int]]: Training dataset, test dataset, and wood prices.
+    """
     num_samples = num_points+test_size
     if "class and regr" in dataset:
         # Generate classification dataset (5 classes)
@@ -152,6 +185,7 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
 
 
 if __name__ == '__main__':
+    # test and visualize the data is retrieved correctly
     df_logs, df_test, prices = get_lumber_data(random.Random(),
                                                "Thai trees class and regr",
                                                num_points=300, test_size=10)
