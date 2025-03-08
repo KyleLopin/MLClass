@@ -84,7 +84,7 @@ def get_wood_prices(random_gen: random.Random) -> dict[str, int]:
 def get_lumber_data(random_gen: random.Random, dataset: str,
                     num_points: int = 3, noise_level: float = 0.05,
                     test_size: int = 0, **kwargs
-                    ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, int]]:
+                    ):
     """
     Generate synthetic lumber dataset with classification and regression targets.
 
@@ -96,7 +96,7 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
         test_size (int): Number of test samples where species and yield are hidden.
 
     Returns:
-        tuple[pd.DataFrame, pd.DataFrame, dict[str, int]]: Training dataset, test dataset, and wood prices.
+       Depends on data requested
     """
     num_samples = num_points+test_size
     if "class and regr" in dataset:
@@ -182,10 +182,13 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
             return _df_train, _df_test, get_wood_prices(random_gen)
 
         return _df_logs, None
+    if "random species" in dataset:
+        return random_gen.choice(thai_tree_species)
 
 
 if __name__ == '__main__':
     # test and visualize the data is retrieved correctly
+    tree = get_lumber_data(random.Random(), "tree random species")
     df_logs, df_test, prices = get_lumber_data(random.Random(),
                                                "Thai trees class and regr",
                                                num_points=300, test_size=10)
