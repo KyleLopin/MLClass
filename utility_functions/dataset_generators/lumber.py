@@ -19,11 +19,21 @@ pd.set_option('display.max_columns', None)
 # Define tree species and their real-world scaling factors
 thai_tree_species = ["Teak", "Siamese Rosewood", "Bullet Wood", "Red Cedar", "Pine"]
 scaling_factors = {
-    "Teak": {"diameter": (20, 70), "length": (6, 25), "taper": (0.5, 1.5), "bark": (1.0, 2.5), "density": 0.70},
-    "Siamese Rosewood": {"diameter": (60, 100), "length": (20, 30), "taper": (0.5, 1.0), "bark": (1.5, 2.5), "density": 0.90},
-    "Bullet Wood": {"diameter": (20, 60), "length": (10, 20), "taper": (0.4, 0.9), "bark": (0.8, 2.0), "density": 0.80},
-    "Red Cedar": {"diameter": (30, 100), "length": (20, 40), "taper": (0.8, 1.3), "bark": (1.2, 2.8), "density": 0.50},
-    "Pine": {"diameter": (30, 80), "length": (15, 35), "taper": (0.6, 1.0), "bark": (1.0, 2.0), "density": 0.40},
+    "Teak": {
+        "diameter": (20, 70), "length": (6, 25), "taper": (0.5, 1.5),
+        "bark": (1.0, 2.5), "density": 0.70},
+    "Siamese Rosewood": {
+        "diameter": (60, 100), "length": (20, 30), "taper": (0.5, 1.0),
+        "bark": (1.5, 2.5), "density": 0.90},
+    "Bullet Wood": {
+        "diameter": (20, 60), "length": (10, 20), "taper": (0.4, 0.9),
+        "bark": (0.8, 2.0), "density": 0.80},
+    "Red Cedar": {
+        "diameter": (30, 100), "length": (20, 40), "taper": (0.8, 1.3),
+        "bark": (1.2, 2.8), "density": 0.50},
+    "Pine": {
+        "diameter": (30, 80), "length": (15, 35), "taper": (0.6, 1.0),
+        "bark": (1.0, 2.0), "density": 0.40},
 }
 
 
@@ -41,10 +51,11 @@ def get_wood_prices(random_gen: random.Random):
         "Siamese Rosewood": (140000, 160000),
         "Bullet Wood": (16000, 20000),
         "Red Cedar": (8000, 10000),
-        "Tenasserim Pine": (6000, 8000),
+        "Pine": (6000, 8000),
     }
 
-    # Randomly sample a price within the given range, round to the nearest 100 THB, and convert to int
+    # Randomly sample a price within the given range, round to the nearest 100 THB,
+    # and convert to int
     wood_prices = {wood: int(round(random_gen.uniform(*price_range), -2)) for
                    wood, price_range in price_ranges.items()}
 
@@ -57,13 +68,13 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
     num_samples = num_points+test_size
     if "class and regr" in dataset:
         # Generate classification dataset (5 classes)
-        X, y = make_classification(
+        x, y = make_classification(
             n_samples=num_samples, n_features=4, n_classes=5, n_informative=3, n_redundant=1,
             n_clusters_per_class=1,
-            random_state=random_gen.randint(1,10000)  # reproduce for same generator
+            random_state=random_gen.randint(1, 10000)  # reproduce for same generator
         )
         # Normalize X values to be within [0, 1] range
-        X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
+        x = (x - x.min(axis=0)) / (x.max(axis=0) - x.min(axis=0))
 
         # Assign species and scale feature values
         species = [thai_tree_species[label] for label in y]
@@ -72,17 +83,18 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
         feature_names = ["diameter", "length", "taper", "bark"]
         df_columns = ["Log Diameter (cm)", "Log Length (m)", "Taper (cm/m)", "Bark Thickness (cm)"]
 
-        # Scale each feature properly
+        # Scale each feature properly, ask chatgpt or god how this is working
         features_scaled = {
             df_columns[i]: np.array([
-                scale_feature(X[j, i], scaling_factors[species[j]][feature_names[i]]) +
-                              random_gen.gauss(0, noise_level * (
-                                                    scaling_factors[species[j]][feature_names[i]][
-                                                        1] -
-                                                    scaling_factors[species[j]][feature_names[i]][
-                                                        0]))
-
-                                    for j in range(num_samples)
+                scale_feature(
+                    x[j, i], scaling_factors[species[j]][feature_names[i]]
+                ) +
+                random_gen.gauss(
+                        0, noise_level * (scaling_factors[species[j]][feature_names[i]][1] -
+                                          scaling_factors[species[j]][feature_names[i]][0]
+                                          )
+                )
+                for j in range(num_samples)
             ])
             for i in range(len(feature_names))
         }
@@ -106,9 +118,9 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
 
         # Create DataFrame dynamically
 
-        df_logs = pd.DataFrame(features_scaled)
-        df_logs["Species"] = species
-        df_logs["Lumber Yield (kg)"] = lumber_yield.round()
+        _df_logs = pd.DataFrame(features_scaled)
+        _df_logs["Species"] = species
+        _df_logs["Lumber Yield (kg)"] = lumber_yield.round()
 
         rounding_rules = {
             "Log Diameter (cm)": 0,  # Round to nearest whole number
@@ -121,22 +133,22 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
         for column, decimals in rounding_rules.items():
             if decimals == 0:
                 # Convert to int for whole numbers
-                df_logs[column] = df_logs[column].round(decimals).astype(int)
+                _df_logs[column] = _df_logs[column].round(decimals).astype(int)
             else:
-                df_logs[column] = df_logs[column].round(decimals)  # Keep decimals for others
+                _df_logs[column] = _df_logs[column].round(decimals)  # Keep decimals for others
 
         # Split into training and test sets
         if test_size > 0:
-            df_train, df_test = train_test_split(
-                df_logs, test_size=test_size/num_samples,
+            _df_train, _df_test = train_test_split(
+                _df_logs, test_size=test_size/num_samples,
                 random_state=random_gen.randint(1, 10000), shuffle=False
             )
 
             # Remove species and lumber yield from test set
-            df_test = df_test.drop(columns=["Species", "Lumber Yield (kg)"])
-            return df_train, df_test, get_wood_prices(random_gen)
+            _df_test = _df_test.drop(columns=["Species", "Lumber Yield (kg)"])
+            return _df_train, _df_test, get_wood_prices(random_gen)
 
-        return df_logs, None
+        return _df_logs, None
 
 
 if __name__ == '__main__':
