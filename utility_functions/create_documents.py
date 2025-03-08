@@ -55,8 +55,9 @@ def insert_table_at_paragraph(doc, paragraph, df, extra_column_name="Prediction"
     hdr_cells = table.rows[0].cells
     for i, column in enumerate(df.columns):
         hdr_cells[i].text = str(column)
-    for j, extra_col in enumerate(extra_column_name):
-        hdr_cells[len(df.columns) + j].text = extra_col  # Add multiple extra column names
+    if extra_column_name:
+        for j, extra_col in enumerate(extra_column_name):
+            hdr_cells[len(df.columns) + j].text = extra_col  # Add multiple extra column names
 
     # Add the dataset rows
     for _, row in df.iterrows():
