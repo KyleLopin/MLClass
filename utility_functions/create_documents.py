@@ -27,10 +27,16 @@ import pickle
 
 # installed libraries
 from docx import Document
+from docx.shared import Inches
 import pandas as pd
 
+# local files
+import get_data  # for testing
+# Format Constants
+MAX_COLUMN_WIDTH = Inches(1.5)
 
-def insert_table_at_paragraph(doc, paragraph, df, extra_column_name="Prediction"):
+
+def insert_table_at_paragraph(doc, paragraph, df, extra_column_name=None):
     """
     Insert a table at the location of a paragraph and remove the paragraph.
 
@@ -47,8 +53,15 @@ def insert_table_at_paragraph(doc, paragraph, df, extra_column_name="Prediction"
     # Get the parent element of the paragraph
     parent_element = paragraph._element
 
-    # Add a new table with an extra column for the Prediction
-    table = doc.add_table(rows=1, cols=len(df.columns) + len(extra_column_name))
+    # Add a new table
+    print("addig table")
+    print(df)
+    if extra_column_name:  # with an extra column for the students to fill in
+        table = doc.add_table(rows=1, cols=len(df.columns) + len(extra_column_name))
+    else:  # just put in the column
+        table = doc.add_table(rows=1, cols=len(df.columns))
+    table.autofit = False
+    table.allow_autofit = False
     table.style = "Table Grid"
 
     # Add the header row
@@ -64,8 +77,16 @@ def insert_table_at_paragraph(doc, paragraph, df, extra_column_name="Prediction"
         row_cells = table.add_row().cells
         for i, value in enumerate(row):
             row_cells[i].text = str(value)
-        for j in range(len(extra_column_name)):  # Add empty cells for extra columns
-            row_cells[len(df.columns) + j].text = ""
+        if extra_column_name:
+            for j in range(len(extra_column_name)):  # Add empty cells for extra columns
+                row_cells[len(df.columns) + j].text = ""
+
+    for row in table.rows:
+        for cell in row.cells:
+            print("cell width: ", cell.width, MAX_COLUMN_WIDTH)
+            if cell.width > MAX_COLUMN_WIDTH:
+                print("changing width")
+                cell.width = MAX_COLUMN_WIDTH
 
     # Insert the table into the document at the correct location
     parent_element.addnext(table._element)
@@ -124,11 +145,18 @@ def create_document(student_name: str, output_file: str,
                 paragraph.text = paragraph.text.replace(placeholder, item)
 
     # Replace table placeholders with actual tables
-    for table_placeholder, (df, target_column_name) in tables.items():
+    print(tables.items())
+    for table_placeholder, df_n_extra_column_names in tables.items():
         for paragraph in doc.paragraphs:
             if table_placeholder in paragraph.text:
                 # Replace the placeholder paragraph with the table
-                insert_table_at_paragraph(doc, paragraph, df, target_column_name)
+                print(type(df_n_extra_column_names))
+                if (isinstance(df_n_extra_column_names, list) and
+                        len(df_n_extra_column_names) >= 2):
+                    df, target_column_name = df_n_extra_column_names
+                    insert_table_at_paragraph(doc, paragraph, df, target_column_name)
+                else:
+                    insert_table_at_paragraph(doc, paragraph, df_n_extra_column_names[0])
                 break  # Stop searching after replacing the placeholder
 
     # Save the document
@@ -160,6 +188,43 @@ def test_midterm_2025():
 
 
 if __name__ == '__main__':
+    getdata = get_data.GetData(43)
+    species2 = "Teak"
+    df_trees, x_trees, prices = getdata.load_data(
+        "Thai trees class and regr",
+        num_points=300, test_size=10)
+    df_trees.reset_index(drop=True, inplace=True)
+    x_trees.reset_index(drop=True, inplace=True)
+
+    # get data for later use in problem 3 and 4
+    df_spectral, sensor, leaf = getdata.load_data("chloro")
+
+    cost_table = {"{Table 1}": [x_trees, "Cost"]}
+
+    questions = [(f"Fill in the table with price expected for each "
+                  "tree below.", cost_table),
+                 (f"For the tree species {species2}.\n"
+                  "\nWhat is the average increase in weight for a "
+                  "1 m increase in its length: ",),
+                 (f"for {sensor} measurements on {leaf} leaves,",)]
+
+    # make document
+    # figure out what this take a table dict
+    print(prices)
+    price_df = pd.DataFrame(list(prices.items()), columns=["Species", "Price"])
+    print(price_df)
+    print("price_df")
+    student_name="Kyle"
+    doc_table = {"{Table 1}": [pd.DataFrame(x_trees), "Cost"],
+                 "{Table 2}": [price_df]}
+    create_document(student_name=student_name,
+                    output_file="Final_Spring_2025.docx",
+                    template_name="Final_s25",
+                    problems=[questions[0][0], questions[1][0],
+                              questions[2][0]],
+                    tables=doc_table)
+
+    ham
     fish_prediction_data = pd.DataFrame({
         "Fish number": ["Fish 1", "Fish 2", "Fish 3"],
         "Length": [30.1, 31.5, 29.8],
