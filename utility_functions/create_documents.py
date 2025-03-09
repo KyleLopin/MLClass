@@ -54,8 +54,6 @@ def insert_table_at_paragraph(doc, paragraph, df, extra_column_name=None):
     parent_element = paragraph._element
 
     # Add a new table
-    print("addig table")
-    print(df)
     if extra_column_name:  # with an extra column for the students to fill in
         table = doc.add_table(rows=1, cols=len(df.columns) + len(extra_column_name))
     else:  # just put in the column
@@ -83,9 +81,7 @@ def insert_table_at_paragraph(doc, paragraph, df, extra_column_name=None):
 
     for row in table.rows:
         for cell in row.cells:
-            print("cell width: ", cell.width, MAX_COLUMN_WIDTH)
             if cell.width > MAX_COLUMN_WIDTH:
-                print("changing width")
                 cell.width = MAX_COLUMN_WIDTH
 
     # Insert the table into the document at the correct location
@@ -145,12 +141,10 @@ def create_document(student_name: str, output_file: str,
                 paragraph.text = paragraph.text.replace(placeholder, item)
 
     # Replace table placeholders with actual tables
-    print(tables.items())
     for table_placeholder, df_n_extra_column_names in tables.items():
         for paragraph in doc.paragraphs:
             if table_placeholder in paragraph.text:
                 # Replace the placeholder paragraph with the table
-                print(type(df_n_extra_column_names))
                 if (isinstance(df_n_extra_column_names, list) and
                         len(df_n_extra_column_names) >= 2):
                     df, target_column_name = df_n_extra_column_names
@@ -210,10 +204,7 @@ if __name__ == '__main__':
 
     # make document
     # figure out what this take a table dict
-    print(prices)
     price_df = pd.DataFrame(list(prices.items()), columns=["Species", "Price"])
-    print(price_df)
-    print("price_df")
     student_name="Kyle"
     doc_table = {"{Table 1}": [pd.DataFrame(x_trees), "Cost"],
                  "{Table 2}": [price_df]}
