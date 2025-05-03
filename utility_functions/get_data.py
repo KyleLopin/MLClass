@@ -11,12 +11,15 @@ __author__ = "Kyle Vitautas Lopin"
 
 # standard libraries
 import importlib
+import os
+from pathlib import Path
 import random
 
 # installed libraries
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
+import yaml
 
 # local files
 import get_fish_data
@@ -76,6 +79,24 @@ class GetData:
             print(f"🔹 Random state: {self.random_gen.getstate()[1][:5]}")
             print("Random values from getdata1:",
                   [self.random_gen.randint(0, 100) for _ in range(5)])
+        # 1. Try loading from YAML index
+        data_path = Path(__file__).parent.parent / "datasets"
+        index_path = data_path / "index.yaml"
+
+        if index_path.exists():
+            with open(index_path, "r") as f:
+                index = yaml.safe_load(f)
+
+            if dataset_loader in index:
+                dataset_info = index[dataset_loader]
+                data_path = data_path / dataset_info["path"]
+                if not data_path.exists():
+                    raise FileNotFoundError(f"CSV file not found: {data_path}")
+                df = pd.read_csv(data_path)
+                print(dataset_info)
+                return df, dataset_info["features"], dataset_info["targets"]
+
+        # 2. Default logic if not in YAML
         if "fish" in dataset_loader:
             return get_fish_data.get_fish_data(self.random_gen, dataset_loader, **kwargs)
         if "tree" in dataset_loader:
@@ -225,6 +246,31 @@ class GetData:
 
         return train_data.reset_index(drop=True), test_data.reset_index(drop=True)
 
+    def available_datasets(self) -> dict:
+        """
+        List all datasets available in the YAML index file.
+
+        Args:
+            index_path (str): Path to the YAML index file.
+
+        Returns:
+            dict: A dictionary where keys are dataset names and values are metadata (if available).
+        """
+        index_path = Path(__file__).parent.parent / "datasets" / "index.yaml"
+
+        if not index_path.exists():
+            raise FileNotFoundError(f"YAML index file not found at: {index_path}")
+
+        with index_path.open("r") as f:
+            index = yaml.safe_load(f)
+
+        lines = ["Available Datasets:"]
+        for key, meta in index.items():
+            desc = meta.get("description", "No description provided.")
+            lines.append(f"  • {key}: {desc}")
+
+        return "\n".join(lines)
+
 
 def check_loaded():
     print("\n\n\n\n================Loaded properly !!! ================ \n")
@@ -233,9 +279,12 @@ def check_loaded():
 # Example Usage
 if __name__ == '__main__':
     getdata = GetData(43)
+    print(getdata.available_datasets())
+    dataset = getdata.load_data("fruit")
+    print(dataset)
 
-    dataset = getdata.load_data("Thai trees class and regr",
-                                num_points=310, test_size=10)
+    # dataset = getdata.load_data("Thai trees class and regr",
+    #                             num_points=310, test_size=10)
     # print(dataset)
     # dataset = getdata.load_data("fish syn", num_points=6)
     # print(dataset)

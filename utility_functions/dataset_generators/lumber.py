@@ -16,6 +16,7 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 pd.set_option('display.max_columns', None)
 
+
 # Define tree species and their real-world scaling factors
 thai_tree_species = ["Teak", "Siamese Rosewood", "Bullet Wood", "Red Cedar", "Pine"]
 scaling_factors = {
@@ -169,14 +170,21 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
                 _df_logs[column] = _df_logs[column].round(decimals).astype(int)
             else:
                 _df_logs[column] = _df_logs[column].round(decimals)  # Keep decimals for others
-
+        print(_df_logs)
         # Split into training and test sets
         if test_size > 0:
+        #     n_each_tree = test_size // 5
+        #
+        #     _df_test = _df_logs.groupby("Species").head(
+        #         n_each_tree)  # First n_each_tree samples per class
+        #     _df_train = _df_logs.drop(_df_test.index)  # The rest for training
+        #
+            # TODO: change to StratifiedShuffleSplit to fix distribution error
             _df_train, _df_test = train_test_split(
                 _df_logs, test_size=test_size/num_samples,
-                random_state=random_gen.randint(1, 10000), shuffle=False
+                random_state=random_gen.randint(1, 10000), shuffle=False,
             )
-
+            print(_df_test)
             # Remove species and lumber yield from test set
             _df_test = _df_test.drop(columns=["Species", "Lumber Yield (kg)"])
             return _df_train, _df_test, get_wood_prices(random_gen)
@@ -189,6 +197,9 @@ def get_lumber_data(random_gen: random.Random, dataset: str,
 if __name__ == '__main__':
     # test and visualize the data is retrieved correctly
     tree = get_lumber_data(random.Random(), "tree random species")
+    student_name = "Kyle"
+
+
     df_logs, df_test, prices = get_lumber_data(random.Random(),
                                                "Thai trees class and regr",
                                                num_points=300, test_size=10)
@@ -197,7 +208,6 @@ if __name__ == '__main__':
     print('====')
     print(df_logs)
     print(df_logs.columns)
-    print(df_logs["Species"].value_counts())
     import matplotlib.pyplot as plt
     import seaborn as sns
 

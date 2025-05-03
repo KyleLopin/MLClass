@@ -1,0 +1,12 @@
+fruit:
+  path: fruit/fruit_data.csv
+  description: Simple fruit dataset with regression and classification labels
+  features:
+    - weight_g
+  targets:
+    regression: price_thb
+    classification:
+      name: species
+      labels:
+        0: orange
+        1: pineapple
