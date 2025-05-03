@@ -14,7 +14,7 @@ Access the midterm template in Google Colab using the link below:
 
 ---
 
-## Midterm (To Be Uploaded)
+## Midterm (Now Uploaded)
 The midterm will be uploaded to this folder on **January 14th, 2025**.
 [Midterm - Google Colab](https://colab.research.google.com/drive/1y25EnVTtzM9nltQAJ20ecZQiXOmQU-MK?usp=sharing/copy)
 
@@ -23,3 +23,9 @@ The midterm will be uploaded to this folder on **January 14th, 2025**.
 
 ## Final Review 
 [Final Review - Google Colab](https://colab.research.google.com/drive/1PjY9ISIRVD1I8rXNev5jztPgHRRIelni?usp=sharing)
+
+
+---
+
+# Final
+[Final - Google Colab](https://colab.research.google.com/drive/1vN01bWI-NcrigTgdbipA1qad2_QWE1OA?usp=copy)
