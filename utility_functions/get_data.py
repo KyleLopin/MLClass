@@ -51,7 +51,7 @@ class GetData:
             Load the Iris dataset, split it into training and test sets,
             and prepare prediction datasets.
     """
-    def __init__(self, seed):
+    def __init__(self, seed: int = 42):
         """
         Initialize the GetData class with a random generator.
 
