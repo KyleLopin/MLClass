@@ -21,7 +21,7 @@ class SimpleNeuron:
         self.loss_fn = nn.MSELoss()
         self.optimizer = optim.SGD(self.model.parameters(), lr=0.01)
 
-    def train(self, input_data: list, output_target: list, epochs: int = 1000):
+    def train(self, input_data: list, output_target: list, epochs: int = 5000):
         """
         Fit the neuron to the input-output data.
         Automatically reshapes 1D input/output lists to 2D tensors.
