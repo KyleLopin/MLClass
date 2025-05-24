@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlclass"
+version = "0.1.0"
+description = "Teaching materials and utilities for ML class"
+authors = [
+    { name="Kyle Lopin" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "PyYAML",
+    "scikit-learn",
+    "pandas",
+    "matplotlib",
+    "requests"
+]
