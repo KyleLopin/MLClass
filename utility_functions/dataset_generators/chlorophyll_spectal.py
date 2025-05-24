@@ -36,7 +36,7 @@ def get_spectral_data(random_gen: random.Random):
     if IN_COLAB:
         df_sensor = pd.read_csv(f"/content/MLClass/datasets/{sensor}_leaves.csv")
     else:  # home computer for testing
-        file_path = Path(__file__).resolve().parents[2] / "datasets"
+        file_path = Path(__file__).resolve().parents[2] / "datasets" / "leaves"
         df_sensor = pd.read_csv(file_path / f"{sensor}_leaves.csv")
 
     df_sensor = df_sensor[df_sensor["leaf"] == leaf]
