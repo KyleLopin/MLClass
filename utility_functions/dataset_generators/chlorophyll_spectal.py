@@ -34,9 +34,9 @@ def get_spectral_data(random_gen: random.Random):
     sensor = random_gen.choice(["as7262", "as7263", "as7265x"])
     leaf = random.choice(["banana", "rice", "mango", "rice", "sugarcane"])
     if IN_COLAB:
-        df_sensor = pd.read_csv(f"/content/MLClass/datasets/{sensor}_leaves.csv")
+        df_sensor = pd.read_csv(f"/content/MLClass/datasets/leaves/{sensor}_leaves.csv")
     else:  # home computer for testing
-        file_path = Path(__file__).resolve().parents[2] / "datasets" / "leaves"
+        file_path = Path(__file__).resolve().parents[2] / "datasets"
         df_sensor = pd.read_csv(file_path / f"{sensor}_leaves.csv")
 
     df_sensor = df_sensor[df_sensor["leaf"] == leaf]
